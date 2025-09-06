@@ -2,4 +2,7 @@
 builder = "nixpacks"
 
 [variables]
-PHP_VERSION = "8.3"
+PHP_VERSION = "8.2"
+
+[start]
+cmd = "php -S 0.0.0.0:$PORT -t public"
