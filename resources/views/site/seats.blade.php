@@ -19,21 +19,28 @@
       <input type="hidden" name="film_id" value="{{ $film->id }}">
       <input type="hidden" name="total_price" value="{{ $film->price }}">
 
-      <!-- Kursi -->
-      <div class="grid grid-cols-6 gap-3 mb-6 max-w-md">
-        @foreach($tickets as $t)
-          @php $disabled = $t->status === 'booked' ? 'disabled' : ''; @endphp
-          <label class="block relative">
-            <input type="checkbox" name="seats[]" value="{{ $t->seat_number }}" class="peer sr-only" {{ $disabled }}>
-            <div class="p-3 text-center border rounded cursor-pointer peer-checked:bg-red-600 peer-checked:text-white transition-colors duration-200 {{ $disabled ? 'bg-gray-200 cursor-not-allowed opacity-50' : 'hover:border-red-600' }}" title="{{ $disabled ? 'Kursi sudah dipesan' : 'Kursi tersedia' }}">
-              {{ $t->seat_number }}
-            </div>
-          </label>
-        @endforeach
+      <!-- Denah gambar (gantikan images/seat-map.jpg dengan gambar denah Anda) -->
+      <div class="mb-6">
+        <p class="mb-2 font-medium">Denah Kursi</p>
+        <img src="{{ asset('images/denah.jpg') }}" alt="Denah Kursi" class="w-full max-w-3xl border rounded mb-2">
+        <p class="text-sm text-gray-600">Pilih kursi melalui daftar di bawah. Gunakan Ctrl / Shift untuk memilih beberapa baris pada desktop.</p>
       </div>
 
-      <!-- Tombol Clear Selection -->
-      <button type="button" onclick="document.querySelectorAll('input[name=\'seats[]\']').forEach(c => c.checked = false);" class="mb-4 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors">
+      <!-- Pilih kursi via dropdown (multi-select) -->
+      <div class="mb-6">
+        <label class="block mb-1 font-medium">Pilih Kursi</label>
+        <select name="seats[]" id="seatsSelect" multiple size="10" class="w-full p-2 border rounded">
+          @foreach($tickets as $t)
+            <option value="{{ $t->seat_number }}" {{ $t->status === 'booked' ? 'disabled' : '' }}>
+              {{ $t->seat_number }} {{ $t->status === 'booked' ? '(Sudah dipesan)' : '' }}
+            </option>
+          @endforeach
+        </select>
+        <p id="selectedInfo" class="mt-2 text-sm text-gray-700">Total: -</p>
+      </div>
+
+      <!-- Tombol Clear Selection (mengosongkan select) -->
+      <button type="button" onclick="document.querySelectorAll('#seatsSelect option').forEach(o => o.selected = false); document.getElementById('seatsSelect').dispatchEvent(new Event('change'));" class="mb-4 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors">
         Clear Selection
       </button>
 
@@ -51,8 +58,8 @@
 
         <div>
           <p class="mb-2 font-medium">Scan QR untuk bayar:</p>
-        <img src="{{ asset('images/qrcode.jpg') }}" alt="QR" class="w-[300px] h-[400px] border rounded">
-
+          <img src="{{ asset('images/qrcode.jpg') }}" alt="QR" class="w-[300px] h-[400px] border rounded">
+        </div>
 
         <div>
           <label class="block mb-1 font-medium">Bukti Pembayaran</label>
@@ -65,5 +72,28 @@
       </div>
     </form>
   </div>
+
+  <script>
+    (function(){
+      const select = document.getElementById('seatsSelect');
+      const totalPriceInput = document.querySelector('input[name="total_price"]');
+      const info = document.getElementById('selectedInfo');
+      const pricePerSeat = Number({{ $film->price }});
+
+      function formatCurrency(v){
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(v);
+      }
+
+      function update(){
+        const count = [...select.selectedOptions].length;
+        const total = count * pricePerSeat;
+        info.textContent = count ? `Terpilih ${count} kursi — Total: ${formatCurrency(total)}` : 'Total: -';
+        totalPriceInput.value = total;
+      }
+
+      select.addEventListener('change', update);
+      update();
+    })();
+  </script>
 </body>
 </html>
