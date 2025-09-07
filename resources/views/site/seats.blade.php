@@ -51,8 +51,8 @@
 
         <div>
           <p class="mb-2 font-medium">Scan QR untuk bayar:</p>
-          <img src="{{ asset('images/qrcode.jpg') }}" alt="QR" class="w-44 h-44 border rounded">
-        </div>
+        <img src="{{ asset('images/qrcode.jpg') }}" alt="QR" class="w-[300px] h-[400px] border rounded">
+
 
         <div>
           <label class="block mb-1 font-medium">Bukti Pembayaran</label>
