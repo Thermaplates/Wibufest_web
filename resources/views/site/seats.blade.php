@@ -10,7 +10,7 @@
   body { font-family: 'Inter', sans-serif; }
 </style>
 </head>
-<body class="p-6 bg-white text-gray-800">
+<body class="p-6 bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-100 transition-colors">
   @include('partials.navbar')
 
   {{-- Flash modal untuk menampilkan pesan success/error setelah submit (jika redirect ke halaman seats) --}}
@@ -31,14 +31,14 @@
   @endif
 
   <div class="max-w-3xl mx-auto">
-    <h1 class="text-2xl md:text-3xl font-bold mb-6 text-red-600">🎬 Pilih Kursi — {{ $film->title }}</h1>
+    <h1 class="text-2xl md:text-3xl font-bold mb-6 text-red-600 dark:text-red-400">🎬 Pilih Kursi — {{ $film->title }}</h1>
 
     <form action="{{ route('book.store') }}" method="POST" enctype="multipart/form-data" id="bookingForm">
       @csrf
       <input type="hidden" name="film_id" value="{{ $film->id }}">
 
       <!-- Informasi Tambahan -->
-    <div class="mt-8 bg-white border rounded p-4 shadow-sm">
+    <div class="mt-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded p-4 shadow-sm transition-colors">
       <h2 class="font-semibold mb-2">Informasi Tambahan</h2>
       <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
         <li>E-ticket akan dikirim ke E-Mail maksimal 3x24 jam setelah pembayaran dikonfirmasi.</li>
@@ -53,7 +53,7 @@
       <div class="mb-6">
         <p class="mb-2 font-medium">Denah Kursi</p>
         <img src="{{ asset('images/denah.jpg') }}" alt="Denah Kursi" class="w-full max-w-3xl border rounded mb-2">
-        <p class="text-sm text-gray-600">Pilih kursi melalui daftar di bawah. Gunakan Ctrl / Shift untuk memilih beberapa baris pada desktop.</p>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Pilih kursi melalui daftar di bawah. Gunakan Ctrl / Shift untuk memilih beberapa baris pada desktop.</p>
       </div>
 
       <!-- Pilih kursi via dropdown (multi-select) -->
@@ -66,11 +66,11 @@
             </option>
           @endforeach
         </select>
-        <p id="selectedInfo" class="mt-2 text-sm text-gray-700">Total: -</p>
+        <p id="selectedInfo" class="mt-2 text-sm text-gray-700 dark:text-gray-300">Total: -</p>
       </div>
 
       <!-- Tombol Clear Selection (mengosongkan select) -->
-      <button type="button" onclick="document.querySelectorAll('#seatsSelect option').forEach(o => o.selected = false); document.getElementById('seatsSelect').dispatchEvent(new Event('change'));" class="mb-4 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors">
+      <button type="button" onclick="document.querySelectorAll('#seatsSelect option').forEach(o => o.selected = false); document.getElementById('seatsSelect').dispatchEvent(new Event('change'));" class="mb-4 px-4 py-2 bg-gray-300 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-400 dark:hover:bg-gray-700 transition-colors">
         Clear Selection
       </button>
 

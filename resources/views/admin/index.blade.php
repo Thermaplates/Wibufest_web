@@ -6,7 +6,7 @@
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
-<body class="p-6 bg-gray-50">
+<body class="p-6 bg-gray-50 dark:bg-gray-950 dark:text-gray-100 transition-colors">
     @include('partials.navbar')
   <div class="flex items-center justify-between mb-4">
     <h1 class="text-2xl font-bold">Admin — Bookings</h1>
@@ -21,8 +21,8 @@
     <div class="p-2 bg-green-200">{{ session('success') }}</div>
   @endif
 
-  <table class="w-full mt-4 bg-white border">
-    <thead class="bg-gray-100">
+  <table class="w-full mt-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+    <thead class="bg-gray-100 dark:bg-gray-800">
       <tr>
         <th class="p-2 border">ID</th>
         <th class="p-2 border">Nama</th>
@@ -33,19 +33,19 @@
     </thead>
     <tbody>
       @foreach($bookings as $b)
-      <tr class="border-t">
-        <td class="p-2 border">{{ $b->id }}</td>
-        <td class="p-2 border">{{ $b->name }}</td>
-        <td class="p-2 border">{{ $b->email }}</td>
-        <td class="p-2 border">{{ $b->tickets?->pluck('seat_number')->join(', ') ?? '-' }}</td>
-        <td class="p-2 border space-x-2">
+      <tr class="border-t border-gray-200 dark:border-gray-800">
+        <td class="p-2 border border-gray-200 dark:border-gray-800">{{ $b->id }}</td>
+        <td class="p-2 border border-gray-200 dark:border-gray-800">{{ $b->name }}</td>
+        <td class="p-2 border border-gray-200 dark:border-gray-800">{{ $b->email }}</td>
+        <td class="p-2 border border-gray-200 dark:border-gray-800">{{ $b->tickets?->pluck('seat_number')->join(', ') ?? '-' }}</td>
+        <td class="p-2 border border-gray-200 dark:border-gray-800 space-x-2">
           <button onclick="showBooking({{ $b->id }})"
-                  class="px-2 py-1 bg-blue-600 text-white rounded">
+                  class="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
             Lihat Bukti
           </button>
           <form method="POST" action="{{ route('admin.booking.delete', $b->id) }}" style="display:inline">
             @csrf
-            <button type="submit" class="px-2 py-1 bg-red-600 text-white rounded">
+            <button type="submit" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded transition-colors">
               Hapus/Set Selesai
             </button>
           </form>
@@ -57,12 +57,12 @@
 
   <!-- Modal -->
   <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white p-4 rounded max-w-lg w-full">
+    <div class="bg-white dark:bg-gray-900 p-4 rounded max-w-lg w-full border border-gray-200 dark:border-gray-800">
       <h3 id="mname" class="font-bold"></h3>
-      <p id="memail" class="text-sm text-gray-600"></p>
+      <p id="memail" class="text-sm text-gray-600 dark:text-gray-300"></p>
       <div id="mimgwrap" class="mt-3"></div>
       <button onclick="closeModal()"
-              class="mt-3 px-3 py-2 bg-gray-700 text-white rounded">
+              class="mt-3 px-3 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded transition-colors">
         Tutup
       </button>
     </div>

@@ -27,3 +27,8 @@ Route::prefix('admin')->middleware('admin.password')->group(function () {
     Route::post('/films/store', [AdminController::class, 'storeFilm'])->name('admin.films.store');
     Route::post('/films/update', [AdminController::class,'updateFilm'])->name('admin.films.update');
 });
+
+// Fallback untuk URL yang tidak dikenal
+Route::fallback(function(){
+    return redirect()->route('home');
+});
