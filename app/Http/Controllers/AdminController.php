@@ -26,7 +26,7 @@ class AdminController extends Controller
             'password' => 'required|string',
         ]);
 
-        $expected = env('ADMIN_PASSWORD', config('app.key'));
+        $expected = (string) config('admin.password');
         if (!is_string($expected) || strlen((string)$expected) === 0) {
             $expected = 'admin123';
         }
