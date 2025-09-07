@@ -78,4 +78,20 @@
       el.style.opacity = '0';
       setTimeout(()=> el.remove(), 250);
     }
+
     document.addEventListener('DOMContentLoaded', ()=>{
+      // jika ada flash modal tampilkan dan auto-close
+      const el = document.getElementById('flashModal');
+      if(!el) return;
+      // pastikan modal terlihat (jika ada class hidden)
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+      // auto close setelah 5 detik
+      setTimeout(closeFlash, 5000);
+      // juga beri fokus tombol tutup jika ada
+      const btn = el.querySelector('button');
+      if(btn) btn.focus();
+    });
+  </script>
+</body>
+</html>

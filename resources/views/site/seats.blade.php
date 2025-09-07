@@ -12,6 +12,24 @@
 </head>
 <body class="p-6 bg-white text-gray-800">
   @include('partials.navbar')
+
+  {{-- Flash modal untuk menampilkan pesan success/error setelah submit (jika redirect ke halaman seats) --}}
+  @if(session('success') || session('error'))
+    <div id="flashModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 mx-4">
+        <h3 class="text-lg font-semibold mb-2 text-gray-900">
+          {{ session('success') ? 'Berhasil' : 'Terjadi Kesalahan' }}
+        </h3>
+        <p class="text-sm text-gray-700">
+          {{ session('success') ?? session('error') }}
+        </p>
+        <div class="mt-4 flex justify-end">
+          <button onclick="closeFlash()" class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700">Tutup</button>
+        </div>
+      </div>
+    </div>
+  @endif
+
   <div class="max-w-3xl mx-auto">
     <h1 class="text-2xl md:text-3xl font-bold mb-6 text-red-600">🎬 Pilih Kursi — {{ $film->title }}</h1>
 
@@ -144,6 +162,22 @@
           }
         });
       }
+
+      function closeFlash(){
+        const el = document.getElementById('flashModal');
+        if(!el) return;
+        el.style.transition = 'opacity .25s ease';
+        el.style.opacity = '0';
+        setTimeout(()=> el.remove(), 250);
+      }
+
+      document.addEventListener('DOMContentLoaded', ()=>{
+        const el = document.getElementById('flashModal');
+        if(!el) return;
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+        setTimeout(closeFlash, 5000);
+      });
     })();
   </script>
 </body>
