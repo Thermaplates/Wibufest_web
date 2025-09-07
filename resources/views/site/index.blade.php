@@ -17,17 +17,25 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       @foreach($films as $f)
       <div class="bg-white rounded-xl shadow-md hover:shadow-lg border border-gray-200 transition-all duration-300 overflow-hidden">
-        <div class="p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-3">{{ $f['title'] }}</h2>
-          <p class="text-gray-600 mb-4">
-            Harga:
-            <span class="font-medium text-red-600">Rp {{ number_format($f['price'],0,',','.') }}</span>
-          </p>
-          <a href="{{ route('film.seats', $f['id']) }}"
-             class="block w-full text-center px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200">
-            Pilih Kursi
-          </a>
-        </div>
+        <a href="{{ route('film.seats', $f['id']) }}" class="block">
+          <!-- Poster: gunakan field poster jika ada, fallback ke placeholder -->
+          <img
+            src="{{ asset( $f['poster'] ?? 'images/poster.jpg' ) }}"
+            alt="{{ $f['title'] }} poster"
+            class="w-full h-48 md:h-56 object-cover"
+            loading="lazy"
+          >
+          <div class="p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-3">{{ $f['title'] }}</h2>
+            <p class="text-gray-600 mb-4">
+              Harga:
+              <span class="font-medium text-red-600">Rp {{ number_format($f['price'],0,',','.') }}</span>
+            </p>
+            <span class="block w-full text-center px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200">
+              Pilih Kursi
+            </span>
+          </div>
+        </a>
       </div>
       @endforeach
     </div>
