@@ -63,10 +63,12 @@
 
         <div>
           <label class="block mb-1 font-medium">Bukti Pembayaran</label>
-          <input type="file" name="payment_screenshot" accept="image/*" required class="w-full p-2 border border-gray-300 rounded">
+          <input id="paymentScreenshot" type="file" name="payment_screenshot" accept="image/*" required class="w-full p-2 border border-gray-300 rounded">
+          <p id="fileHelp" class="text-sm text-gray-600 mt-2">Batas upload: 5 MB. Format gambar: .jpg, .jpeg, .png</p>
+          <p id="fileError" class="text-sm text-red-600 mt-2 hidden" role="alert" aria-live="polite"></p>
         </div>
 
-        <button type="submit" class="w-full mt-3 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors">
+        <button id="submitButton" type="submit" class="w-full mt-3 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors">
           Booking Sekarang
         </button>
       </div>
@@ -93,6 +95,54 @@
 
       select.addEventListener('change', update);
       update();
+
+      // Validasi ukuran file (maks 5 MB)
+      const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+      const fileInput = document.getElementById('paymentScreenshot');
+      const fileError = document.getElementById('fileError');
+      const submitBtn = document.getElementById('submitButton');
+      const form = document.getElementById('bookingForm');
+
+      function showFileError(msg){
+        fileError.textContent = msg;
+        fileError.classList.remove('hidden');
+        submitBtn.disabled = true;
+      }
+      function clearFileError(){
+        fileError.textContent = '';
+        fileError.classList.add('hidden');
+        submitBtn.disabled = false;
+      }
+
+      if (fileInput) {
+        fileInput.addEventListener('change', () => {
+          clearFileError();
+          if (!fileInput.files || !fileInput.files[0]) return;
+          const f = fileInput.files[0];
+          if (f.size > MAX_BYTES) {
+            showFileError('File terlalu besar. Maksimum 5 MB. Silakan pilih file lain.');
+            fileInput.value = '';
+            return;
+          }
+          // opsional: periksa tipe mime dasar
+          const allowed = ['image/jpeg','image/png','image/jpg'];
+          if (!allowed.includes(f.type)) {
+            showFileError('Format tidak didukung. Gunakan .jpg atau .png.');
+            fileInput.value = '';
+            return;
+          }
+          clearFileError();
+        });
+      }
+
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          if (fileInput && fileInput.files && fileInput.files[0] && fileInput.files[0].size > MAX_BYTES) {
+            e.preventDefault();
+            showFileError('File terlalu besar. Maksimum 5 MB.');
+          }
+        });
+      }
     })();
   </script>
 </body>
