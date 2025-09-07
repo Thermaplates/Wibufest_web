@@ -7,42 +7,42 @@ use App\Models\Booking;
 use App\Models\Ticket;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class BookingController extends Controller
 {
-    public function store(Request $r)
+    public function store(Request $request)
     {
-        $r->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email',
+            'email' => 'required|email|max:255',
             'film_id' => 'required|exists:films,id',
             'total_price' => 'required|numeric',
             'seats' => 'required|array|min:1',
-            'payment_screenshot' => 'required|image|max:4096',
+            'seats.*' => 'required|string',
+            'payment_screenshot' => 'required|image|mimes:jpg,jpeg,png|max:5120', // 5 MB
         ]);
 
         DB::beginTransaction();
         try {
-           $booking = Booking::create([
-    'name'   => $r->name,
-    'email'  => $r->email,
-    'film_id'=> $r->film_id,
-    'payment_status'=>'pending',
-    'status'=>'active',
-]);
+            $booking = Booking::create([
+                'name'   => $request->name,
+                'email'  => $request->email,
+                'film_id'=> $request->film_id,
+                'payment_status'=>'pending',
+                'status'=>'active',
+            ]);
 
-if($r->hasFile('payment_screenshot')){
-    $file = $r->file('payment_screenshot');
-    $binaryData = file_get_contents($file->getRealPath());
-    $booking->payment_screenshot = $binaryData;
-    $booking->save();
-}
+            // simpan file
+            $path = $request->file('payment_screenshot')->store('payments', 'public');
 
+            $booking->payment_screenshot = $path;
+            $booking->save();
 
             // Tandai kursi sebagai booked
-            foreach($r->seats as $seat){
+            foreach($request->seats as $seat){
                 $ticket = Ticket::where('seat_number', $seat)
-                                ->where('film_id', $r->film_id)
+                                ->where('film_id', $request->film_id)
                                 ->lockForUpdate()
                                 ->first();
 

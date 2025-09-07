@@ -8,7 +8,8 @@ use App\Http\Controllers\AdminController;
 // User
 Route::get('/', [SiteController::class,'index'])->name('home');
 Route::get('/film/{id}/seats', [SiteController::class,'seats'])->name('film.seats');
-Route::post('/book', [BookingController::class,'store'])->name('book.store');
+
+Route::post('/book', [BookingController::class, 'store'])->name('book.store');
 
 Route::prefix('admin')->group(function () {
     Route::get('/', [AdminController::class,'index'])->name('admin.dashboard');
