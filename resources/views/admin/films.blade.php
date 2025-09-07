@@ -6,6 +6,7 @@
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="p-6 bg-gray-50">
+  @include('partials.navbar')
   <h1 class="text-2xl font-bold">Admin — Film</h1>
 
   @if(session('success'))

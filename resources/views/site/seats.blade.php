@@ -11,6 +11,7 @@
 </style>
 </head>
 <body class="p-6 bg-white text-gray-800">
+  @include('partials.navbar')
   <div class="max-w-3xl mx-auto">
     <h1 class="text-2xl md:text-3xl font-bold mb-6 text-red-600">🎬 Pilih Kursi — {{ $film->title }}</h1>
 

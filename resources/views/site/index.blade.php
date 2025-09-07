@@ -11,6 +11,7 @@
   </style>
 </head>
 <body class="bg-white min-h-screen p-6 md:p-12 text-gray-800">
+  @include('partials.navbar')
   <div class="max-w-6xl mx-auto">
     <h1 class="text-3xl md:text-4xl font-bold mb-8 text-red-600">🎬 Pilih Film</h1>
 
