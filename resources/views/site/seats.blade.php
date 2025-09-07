@@ -22,6 +22,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   body { font-family: 'Inter', sans-serif; }
+  ::selection { background: #ef4444; color: white; }
+  .dark ::selection { background: #f87171; color: #111827; }
 </style>
 </head>
 <body class="p-6 bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-100 transition-colors">
@@ -73,7 +75,7 @@
       <!-- Pilih kursi via dropdown (multi-select) -->
       <div class="mb-6">
         <label class="block mb-1 font-medium">Pilih Kursi</label>
-        <select name="seats[]" id="seatsSelect" multiple size="10" class="w-full p-2 border rounded">
+        <select name="seats[]" id="seatsSelect" multiple size="10" class="w-full p-2 border rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500/60">
           @foreach($tickets as $t)
             <option value="{{ $t->seat_number }}" {{ $t->status === 'booked' ? 'disabled' : '' }}>
               {{ $t->seat_number }} {{ $t->status === 'booked' ? '(Sudah dipesan)' : '' }}
@@ -84,7 +86,7 @@
       </div>
 
       <!-- Tombol Clear Selection (mengosongkan select) -->
-      <button type="button" onclick="document.querySelectorAll('#seatsSelect option').forEach(o => o.selected = false); document.getElementById('seatsSelect').dispatchEvent(new Event('change'));" class="mb-4 px-4 py-2 bg-gray-300 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-400 dark:hover:bg-gray-700 transition-colors">
+      <button type="button" onclick="document.querySelectorAll('#seatsSelect option').forEach(o => o.selected = false); document.getElementById('seatsSelect').dispatchEvent(new Event('change'));" class="mb-4 px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors">
         Clear Selection
       </button>
 
@@ -92,12 +94,12 @@
       <div class="space-y-4">
         <div>
           <label class="block mb-1 font-medium">Nama</label>
-          <input type="text" name="name" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500" required>
+          <input type="text" name="name" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500/60" required>
         </div>
 
         <div>
           <label class="block mb-1 font-medium">Email</label>
-          <input type="email" name="email" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500" required>
+          <input type="email" name="email" class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500/60" required>
         </div>
 
         <div>
@@ -107,7 +109,7 @@
 
         <div>
           <label class="block mb-1 font-medium">Bukti Pembayaran</label>
-          <input id="paymentScreenshot" type="file" name="payment_screenshot" accept="image/*" required class="w-full p-2 border border-gray-300 rounded">
+          <input id="paymentScreenshot" type="file" name="payment_screenshot" accept="image/*" required class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
           <p id="fileHelp" class="text-sm text-gray-600 mt-2">Batas upload: 5 MB. Format gambar: .jpg, .jpeg, .png</p>
           <p id="fileError" class="text-sm text-red-600 mt-2 hidden" role="alert" aria-live="polite"></p>
         </div>

@@ -24,6 +24,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; }
+    ::selection { background: #ef4444; color: white; }
+    .dark ::selection { background: #f87171; color: #111827; }
   </style>
 </head>
 <body class="bg-white dark:bg-gray-950 min-h-screen p-6 md:p-12 text-gray-800 dark:text-gray-100 transition-colors">

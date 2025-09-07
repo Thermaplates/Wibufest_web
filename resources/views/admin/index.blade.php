@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title>Admin Dashboard</title>
 <link rel="icon" href="{{ asset('favicon.ico') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>
   (function(){
     const saved = localStorage.getItem('theme');
@@ -19,6 +20,11 @@
   tailwind.config = { darkMode: 'class' }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  ::selection { background: #ef4444; color: white; }
+  .dark ::selection { background: #f87171; color: #111827; }
+</style>
 </head>
 <body class="p-6 bg-gray-50 dark:bg-gray-950 dark:text-gray-100 transition-colors">
     @include('partials.navbar')
