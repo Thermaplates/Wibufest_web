@@ -174,6 +174,24 @@ class AdminController extends Controller
         return redirect()->route('admin.dashboard')->with('success','Booking dihapus.');
     }
 
+    // Hapus semua booking & reset kursi + reset auto-increment
+    public function clearAllBookings()
+    {
+        DB::transaction(function () {
+            // Kosongkan relasi kursi
+            DB::table('tickets')->whereNotNull('booking_id')->update([
+                'status' => 'available',
+                'booking_id' => null,
+                'ticket_number' => null,
+            ]);
+
+            // Hapus semua bookings dan reset auto increment agar mulai dari 1 lagi
+            DB::statement('TRUNCATE TABLE bookings');
+        });
+
+        return redirect()->route('admin.dashboard')->with('success','Semua booking dihapus dan ID direset.');
+    }
+
     // Page film
     public function films()
     {

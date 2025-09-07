@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between h-16">
       <div class="flex items-center space-x-4">
         <a href="{{ url('/') }}" class="flex items-center space-x-2">
-          <img src="{{ asset('navbar.ico') }}" alt="Logo" class="w-8 h-8">
+          <img src="{{ asset('favicon.ico') }}" alt="Logo" class="w-8 h-8">
           <span class="text-xl font-bold text-red-600 dark:text-red-400">Wibufest Jogja</span>
         </a>
         <a href="{{ url('/') }}" class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Home</a>

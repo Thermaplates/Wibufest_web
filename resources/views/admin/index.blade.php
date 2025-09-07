@@ -3,7 +3,21 @@
 <head>
 <meta charset="utf-8">
 <title>Admin Dashboard</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css" rel="stylesheet">
+<link rel="icon" href="{{ asset('favicon.ico') }}">
+<script>
+  (function(){
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  })();
+  </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { darkMode: 'class' }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body class="p-6 bg-gray-50 dark:bg-gray-950 dark:text-gray-100 transition-colors">
@@ -14,6 +28,10 @@
       <a href="{{ route('admin.films') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none">
         Tambah / Kelola Film
       </a>
+      <form method="POST" action="{{ route('admin.bookings.clear') }}" onsubmit="return confirm('Hapus semua booking dan reset ID?');">
+        @csrf
+        <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded focus:outline-none">Hapus Semua</button>
+      </form>
     </div>
   </div>
 
