@@ -36,7 +36,6 @@
     <form action="{{ route('book.store') }}" method="POST" enctype="multipart/form-data" id="bookingForm">
       @csrf
       <input type="hidden" name="film_id" value="{{ $film->id }}">
-      <input type="hidden" name="total_price" value="{{ $film->price }}">
 
       <!-- Informasi Tambahan -->
     <div class="mt-8 bg-white border rounded p-4 shadow-sm">
@@ -109,7 +108,7 @@
   <script>
     (function(){
       const select = document.getElementById('seatsSelect');
-      const totalPriceInput = document.querySelector('input[name="total_price"]');
+
       const info = document.getElementById('selectedInfo');
       const pricePerSeat = Number({{ $film->price }});
 
@@ -121,7 +120,7 @@
         const count = [...select.selectedOptions].length;
         const total = count * pricePerSeat;
         info.textContent = count ? `Terpilih ${count} kursi — Total: ${formatCurrency(total)}` : 'Total: -';
-        totalPriceInput.value = total;
+
       }
 
       select.addEventListener('change', update);

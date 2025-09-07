@@ -13,7 +13,6 @@ class Booking extends Model
         'name',
         'email',
         'film_id',
-        'total_price',
         'payment_screenshot',
         'payment_status',
         'status',

@@ -17,7 +17,6 @@ class BookingController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'film_id' => 'required|exists:films,id',
-            'total_price' => 'required|numeric',
             'seats' => 'required|array|min:1',
             'seats.*' => 'required|string',
             'payment_screenshot' => 'required|image|mimes:jpg,jpeg,png|max:5120', // 5 MB
@@ -29,7 +28,6 @@ class BookingController extends Controller
                 'name'         => $request->name,
                 'email'        => $request->email,
                 'film_id'      => $request->film_id,
-                'total_price'  => $request->total_price,
                 'payment_status' => 'pending',
                 'status'         => 'active',
             ]);
