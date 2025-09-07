@@ -22,7 +22,7 @@
           <img
             src="{{ asset( $f['poster'] ?? 'images/poster.jpg' ) }}"
             alt="{{ $f['title'] }} poster"
-            class="w-full h-48 md:h-56 object-cover"
+            class="w-full h-auto object-contain"
             loading="lazy"
           >
           <div class="p-6">
