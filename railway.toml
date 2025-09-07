@@ -2,7 +2,7 @@
 builder = "nixpacks"
 
 [variables]
-PHP_VERSION = "8.2"
+PHP_VERSION = "8.3"
 
 [start]
-cmd = "php -S 0.0.0.0:$PORT -t public"
+cmd = "php artisan optimize && php artisan storage:link || true && php artisan migrate --force && php -S 0.0.0.0:$PORT -t public"
