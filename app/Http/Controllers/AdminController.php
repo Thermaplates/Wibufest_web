@@ -9,9 +9,42 @@ use App\Models\Ticket;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Redirect;
 
 class AdminController extends Controller
 {
+    // Login form
+    public function loginForm()
+    {
+        return view('admin.login');
+    }
+
+    // Handle login submit
+    public function loginSubmit(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string',
+        ]);
+
+        $expected = env('ADMIN_PASSWORD', config('app.key'));
+        if (!is_string($expected) || strlen((string)$expected) === 0) {
+            $expected = 'admin123';
+        }
+
+        if (hash_equals((string)$expected, (string)$request->input('password'))) {
+            $request->session()->put('admin_authenticated', true);
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('admin.login')->with('error', 'Password salah.');
+    }
+
+    // Logout
+    public function logout(Request $request)
+    {
+        $request->session()->forget('admin_authenticated');
+        return redirect()->route('admin.login');
+    }
     // Halaman utama admin: daftar booking
     public function index()
     {
