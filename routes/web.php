@@ -13,9 +13,9 @@ Route::post('/book', [BookingController::class, 'store'])->name('book.store');
 
 Route::prefix('admin')->group(function () {
     Route::get('/', [AdminController::class,'index'])->name('admin.dashboard');
-    Route::get('/booking/{id}', [AdminController::class,'showBooking'])->name('admin.booking.show');
-    Route::get('/booking/{id}/payment', [AdminController::class,'showPayment'])->name('admin.booking.payment');
-    Route::post('/booking/{id}/delete', [AdminController::class,'deleteBooking'])->name('admin.booking.delete');
+    Route::get('/booking/{id}', [AdminController::class, 'showBooking']);
+    Route::get('/booking/{id}/payment', [AdminController::class, 'showPayment']);
+    Route::post('/booking/{id}/delete', [AdminController::class, 'deleteBooking'])->name('admin.booking.delete');
 
     Route::get('/films', [AdminController::class,'films'])->name('admin.films');
     Route::post('/films/update', [AdminController::class,'updateFilm'])->name('admin.films.update');

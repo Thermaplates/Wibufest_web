@@ -7,6 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body class="p-6 bg-gray-50">
+    +  @include('partials.navbar')
   <h1 class="text-2xl font-bold">Admin — Bookings</h1>
 
   @if(session('success'))

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Film;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -30,7 +31,7 @@ class AdminController extends Controller
         ]);
     }
 
-    // Tampilkan gambar bukti bayar
+    // Tampilkan gambar bukti bayar (mengambil langsung dari field DB, bukan file path)
     public function showPayment($id)
     {
         $booking = Booking::findOrFail($id);
@@ -39,8 +40,34 @@ class AdminController extends Controller
             abort(404);
         }
 
-        return response($booking->payment_screenshot)
-               ->header('Content-Type', 'image/png');
+        $img = $booking->payment_screenshot;
+
+        // Jika disimpan sebagai data URI (data:image/png;base64,...)
+        if (is_string($img) && strpos($img, 'data:image') === 0) {
+            [$meta, $base64] = explode(',', $img, 2) + [null, null];
+            preg_match('/data:(image\/[a-zA-Z0-9\-\+\.]+);base64/', $meta, $m);
+            $mime = $m[1] ?? 'image/jpeg';
+            $contents = base64_decode($base64);
+            return response($contents, 200)
+                ->header('Content-Type', $mime)
+                ->header('Content-Length', strlen($contents));
+        }
+
+        // Jika disimpan sebagai binary BLOB (string)
+        if (is_string($img) || is_resource($img)) {
+            $contents = is_resource($img) ? stream_get_contents($img) : $img;
+            if (function_exists('finfo_buffer')) {
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $mime = $finfo->buffer($contents) ?: 'image/jpeg';
+            } else {
+                $mime = 'image/jpeg';
+            }
+            return response($contents, 200)
+                ->header('Content-Type', $mime)
+                ->header('Content-Length', strlen($contents));
+        }
+
+        abort(404);
     }
 
     // Hapus booking & kosongkan kursi
