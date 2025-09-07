@@ -28,7 +28,7 @@ class AdminController extends Controller
 
         $expected = (string) config('admin.password');
         if (!is_string($expected) || strlen((string)$expected) === 0) {
-            $expected = 'admin123';
+            $expected = 'wongislamjumatan';
         }
 
         if (hash_equals((string)$expected, (string)$request->input('password'))) {
@@ -57,12 +57,25 @@ class AdminController extends Controller
     {
         $booking = Booking::with('tickets')->findOrFail($id);
 
+        $p = $booking->payment_screenshot;
+        $hasPayment = false;
+        if (!is_null($p)) {
+            if (is_string($p)) {
+                $hasPayment = strlen($p) > 0;
+            } elseif (is_resource($p)) {
+                // resource stream dianggap ada isinya
+                $hasPayment = true;
+            } else {
+                $hasPayment = true; // tipe lain (mis. binary string) dianggap ada
+            }
+        }
+
         return response()->json([
             'id' => $booking->id,
             'name' => $booking->name,
             'email' => $booking->email,
             'tickets' => $booking->tickets->pluck('seat_number'),
-            'has_payment' => !empty($booking->payment_screenshot),
+            'has_payment' => $hasPayment,
         ]);
     }
 
@@ -77,7 +90,7 @@ class AdminController extends Controller
 
         $img = $booking->payment_screenshot;
 
-        // Jika disimpan sebagai data URI (data:image/png;base64,...)
+        // 1) Data URI (data:image/png;base64,...)
         if (is_string($img) && strpos($img, 'data:image') === 0) {
             [$meta, $base64] = explode(',', $img, 2) + [null, null];
             preg_match('/data:(image\/[a-zA-Z0-9\-\+\.]+);base64/', $meta, $m);
@@ -88,13 +101,51 @@ class AdminController extends Controller
                 ->header('Content-Length', strlen($contents));
         }
 
-        // Jika berupa path di disk 'public' (payments/xxx.jpg)
+        // 2) Path di disk 'public' (payments/xxx.jpg)
         if (is_string($img)) {
             if (Storage::disk('public')->exists($img)) {
                 $contents = Storage::disk('public')->get($img);
                 $root = config('filesystems.disks.public.root');
                 $fullPath = rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($img, DIRECTORY_SEPARATOR);
                 $mime = File::mimeType($fullPath) ?: 'image/jpeg';
+                return response($contents, 200)
+                    ->header('Content-Type', $mime)
+                    ->header('Content-Length', strlen($contents));
+            }
+        }
+
+        // 3) BLOB/LONGBLOB binary dari database
+        //    Bisa datang sebagai resource stream atau string binary.
+        if (is_resource($img)) {
+            $contents = stream_get_contents($img) ?: '';
+            if ($contents !== '') {
+                $mime = function_exists('finfo_open')
+                    ? (finfo_file(finfo_open(FILEINFO_MIME_TYPE), 'php://memory') ?: 'image/jpeg')
+                    : 'image/jpeg';
+                // Coba deteksi via getimagesizefromstring jika tersedia
+                if (function_exists('getimagesizefromstring')) {
+                    $info = @getimagesizefromstring($contents);
+                    if ($info && isset($info['mime'])) {
+                        $mime = $info['mime'];
+                    }
+                }
+                return response($contents, 200)
+                    ->header('Content-Type', $mime)
+                    ->header('Content-Length', strlen($contents));
+            }
+        }
+
+        if (is_string($img)) {
+            // Jika bukan data-uri dan bukan path valid, asumsi ini string binary dari kolom BLOB
+            $contents = $img;
+            if ($contents !== '') {
+                $mime = 'image/jpeg';
+                if (function_exists('getimagesizefromstring')) {
+                    $info = @getimagesizefromstring($contents);
+                    if ($info && isset($info['mime'])) {
+                        $mime = $info['mime'];
+                    }
+                }
                 return response($contents, 200)
                     ->header('Content-Type', $mime)
                     ->header('Content-Length', strlen($contents));
