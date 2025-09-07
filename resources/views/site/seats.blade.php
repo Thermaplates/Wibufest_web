@@ -92,6 +92,17 @@
         </button>
       </div>
     </form>
+
+    <!-- Informasi Tambahan -->
+    <div class="mt-8 bg-white border rounded p-4 shadow-sm">
+      <h2 class="font-semibold mb-2">Informasi Tambahan</h2>
+      <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
+        <li>E-ticket akan dikirim ke E-Mail maksimal 3x24 jam setelah pembayaran dikonfirmasi.</li>
+        <li>Tiket bersifat <strong>non-refundable</strong>.</li>
+        <li>Penentuan posisi duduk dilakukan di lokasi event.</li>
+        <li>Harap datang ke lokasi minimal 30 menit sebelum pemutaran dimulai.</li>
+      </ol>
+    </div>
   </div>
 
   <script>
