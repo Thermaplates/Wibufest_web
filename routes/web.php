@@ -18,5 +18,6 @@ Route::prefix('admin')->group(function () {
     Route::post('/booking/{id}/delete', [AdminController::class, 'deleteBooking'])->name('admin.booking.delete');
 
     Route::get('/films', [AdminController::class,'films'])->name('admin.films');
+    Route::post('/films/store', [AdminController::class, 'storeFilm'])->name('admin.films.store');
     Route::post('/films/update', [AdminController::class,'updateFilm'])->name('admin.films.update');
 });

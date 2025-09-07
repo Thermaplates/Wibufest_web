@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Film;
+use App\Models\Ticket;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -96,21 +97,70 @@ class AdminController extends Controller
         return view('admin.films', compact('films'));
     }
 
+    // Simpan film baru + cover + kursi
+    public function storeFilm(Request $r)
+    {
+        $r->validate([
+            'title'  => 'required|string|max:255',
+            'price'  => 'required|numeric',
+            'cover'  => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // 5 MB
+            'seats'  => 'nullable|string', // daftar nomor kursi, dipisah koma atau newline
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Upload cover ke public/images agar bisa diakses via asset('images/...')
+            $coverPath = null;
+            if ($r->hasFile('cover')) {
+                $file = $r->file('cover');
+                $safeName = time() . '_' . preg_replace('/[^A-Za-z0-9\-\_\.]/', '', $file->getClientOriginalName());
+                $file->move(public_path('images'), $safeName);
+                $coverPath = 'images/' . $safeName;
+            }
+
+            $film = Film::create([
+                'title'     => $r->title,
+                'price'     => $r->price,
+                'poster'    => $coverPath, // sesuaikan nama kolom (poster) di model/migrasi
+                'is_active' => $r->has('is_active') ? 1 : 0,
+            ]);
+
+            // Buat tiket/kursi jika ada input seats (pisah dengan koma atau newline)
+            if ($r->filled('seats')) {
+                $items = preg_split('/[\r\n,]+/', $r->seats);
+                foreach ($items as $it) {
+                    $seat = trim($it);
+                    if (!$seat) continue;
+                    Ticket::create([
+                        'film_id'     => $film->id,
+                        'seat_number' => $seat,
+                        'status'      => 'available',
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('admin.films')->with('success', 'Film dan kursi berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menambahkan film: ' . $e->getMessage());
+        }
+    }
+
     // Update film
     public function updateFilm(Request $r)
     {
         $r->validate([
-            'id'=>'required|exists:films,id',
-            'title'=>'required',
             'price'=>'required|numeric',
         ]);
-
+ 
         $film = Film::findOrFail($r->id);
         $film->title = $r->title;
         $film->price = $r->price;
-        $film->is_active = $r->has('is_active');
+        $film->is_active = $r->has('is_active') ? 1 : 0;
         $film->save();
-
-        return redirect()->route('admin.films')->with('success','Film berhasil diupdate');
+ 
+        return redirect()->route('admin.films')->with('success','Film diperbarui.');
     }
 }

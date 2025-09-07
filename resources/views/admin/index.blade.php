@@ -8,7 +8,14 @@
 </head>
 <body class="p-6 bg-gray-50">
     @include('partials.navbar')
-  <h1 class="text-2xl font-bold">Admin — Bookings</h1>
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold">Admin — Bookings</h1>
+    <div class="flex items-center space-x-2">
+      <a href="{{ route('admin.films') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none">
+        Tambah / Kelola Film
+      </a>
+    </div>
+  </div>
 
   @if(session('success'))
     <div class="p-2 bg-green-200">{{ session('success') }}</div>
