@@ -12,6 +12,7 @@ class Film extends Model
     protected $fillable = [
         'title',
         'price',
+        'poster',
         'is_active',
     ];
 

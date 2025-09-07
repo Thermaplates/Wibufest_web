@@ -26,11 +26,12 @@ class BookingController extends Controller
         DB::beginTransaction();
         try {
             $booking = Booking::create([
-                'name'   => $request->name,
-                'email'  => $request->email,
-                'film_id'=> $request->film_id,
-                'payment_status'=>'pending',
-                'status'=>'active',
+                'name'         => $request->name,
+                'email'        => $request->email,
+                'film_id'      => $request->film_id,
+                'total_price'  => $request->total_price,
+                'payment_status' => 'pending',
+                'status'         => 'active',
             ]);
 
             // simpan file

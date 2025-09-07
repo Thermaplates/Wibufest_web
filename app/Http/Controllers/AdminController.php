@@ -8,6 +8,7 @@ use App\Models\Film;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class AdminController extends Controller
 {
@@ -32,7 +33,7 @@ class AdminController extends Controller
         ]);
     }
 
-    // Tampilkan gambar bukti bayar (mengambil langsung dari field DB, bukan file path)
+    // Tampilkan gambar bukti bayar dari path storage:public atau data-uri/blobs
     public function showPayment($id)
     {
         $booking = Booking::findOrFail($id);
@@ -54,18 +55,17 @@ class AdminController extends Controller
                 ->header('Content-Length', strlen($contents));
         }
 
-        // Jika disimpan sebagai binary BLOB (string)
-        if (is_string($img) || is_resource($img)) {
-            $contents = is_resource($img) ? stream_get_contents($img) : $img;
-            if (function_exists('finfo_buffer')) {
-                $finfo = new \finfo(FILEINFO_MIME_TYPE);
-                $mime = $finfo->buffer($contents) ?: 'image/jpeg';
-            } else {
-                $mime = 'image/jpeg';
+        // Jika berupa path di disk 'public' (payments/xxx.jpg)
+        if (is_string($img)) {
+            if (Storage::disk('public')->exists($img)) {
+                $contents = Storage::disk('public')->get($img);
+                $root = config('filesystems.disks.public.root');
+                $fullPath = rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($img, DIRECTORY_SEPARATOR);
+                $mime = File::mimeType($fullPath) ?: 'image/jpeg';
+                return response($contents, 200)
+                    ->header('Content-Type', $mime)
+                    ->header('Content-Length', strlen($contents));
             }
-            return response($contents, 200)
-                ->header('Content-Type', $mime)
-                ->header('Content-Length', strlen($contents));
         }
 
         abort(404);
@@ -154,13 +154,13 @@ class AdminController extends Controller
         $r->validate([
             'price'=>'required|numeric',
         ]);
- 
+
         $film = Film::findOrFail($r->id);
         $film->title = $r->title;
         $film->price = $r->price;
         $film->is_active = $r->has('is_active') ? 1 : 0;
         $film->save();
- 
+
         return redirect()->route('admin.films')->with('success','Film diperbarui.');
     }
 }
