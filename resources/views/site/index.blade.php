@@ -12,6 +12,24 @@
 </head>
 <body class="bg-white min-h-screen p-6 md:p-12 text-gray-800">
   @include('partials.navbar')
+
+  {{-- Flash modal untuk menampilkan pesan success/error setelah submit --}}
+  @if(session('success') || session('error'))
+    <div id="flashModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 mx-4">
+        <h3 class="text-lg font-semibold mb-2 text-gray-900">
+          {{ session('success') ? 'Berhasil' : 'Terjadi Kesalahan' }}
+        </h3>
+        <p class="text-sm text-gray-700">
+          {{ session('success') ?? session('error') }}
+        </p>
+        <div class="mt-4 flex justify-end">
+          <button onclick="closeFlash()" class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700">Tutup</button>
+        </div>
+      </div>
+    </div>
+  @endif
+
   <div class="max-w-6xl mx-auto">
     <h1 class="text-3xl md:text-4xl font-bold mb-8 text-red-600">🎬 Pilih Film</h1>
 
@@ -50,5 +68,14 @@
       </p>
     </footer>
   </div>
-</body>
-</html>
+
+  <script>
+    function closeFlash(){
+      const el = document.getElementById('flashModal');
+      if(!el) return;
+      // animasi fade out sederhana
+      el.style.transition = 'opacity .25s ease';
+      el.style.opacity = '0';
+      setTimeout(()=> el.remove(), 250);
+    }
+    document.addEventListener('DOMContentLoaded', ()=>{
