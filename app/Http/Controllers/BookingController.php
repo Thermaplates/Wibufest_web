@@ -25,46 +25,35 @@ class BookingController extends Controller
         DB::beginTransaction();
         try {
             $booking = Booking::create([
-                'name'           => $request->name,
-                'email'          => $request->email,
-                'film_id'        => $request->film_id,
+                'name'         => $request->name,
+                'email'        => $request->email,
+                'film_id'      => $request->film_id,
                 'payment_status' => 'pending',
                 'status'         => 'active',
             ]);
 
-            // simpan file payment
+            // simpan file
             $path = $request->file('payment_screenshot')->store('payments', 'public');
+
             $booking->payment_screenshot = $path;
             $booking->save();
 
-            // Ambil semua kursi yang sudah ada untuk film ini
-            $existingSeats = DB::table('tickets')
-                ->where('film_id', $request->film_id)
-                ->pluck('kursi')
-                ->toArray();
+            // Tandai kursi sebagai booked
+            foreach($request->seats as $seat){
+                $ticket = Ticket::where('seat_number', $seat)
+                                ->where('film_id', $request->film_id)
+                                ->lockForUpdate()
+                                ->first();
 
-            // Tentukan kursi baru untuk tiket yang dipilih
-            $newSeats = [];
-            foreach($request->seats as $seatNumber){
-                $nextSeat = 1;
-                while(in_array($nextSeat, $existingSeats) || in_array($nextSeat, $newSeats)){
-                    $nextSeat++;
+                if(!$ticket || $ticket->status === 'booked'){
+                    DB::rollBack();
+                    return back()->with('error', 'Kursi '.$seat.' sudah dibooking orang lain.');
                 }
-                $newSeats[] = $nextSeat;
-            }
 
-            // Simpan tiket dengan kursi baru
-            foreach($request->seats as $i => $seatNumber){
-                DB::table('tickets')->insert([
-                    'film_id'       => $request->film_id,
-                    'booking_id'    => $booking->id,
-                    'seat_number'   => $seatNumber,
-                    'kursi'         => $newSeats[$i],
-                    'ticket_number' => Str::upper(Str::random(8)),
-                    'status'        => 'booked',
-                    'created_at'    => now(),
-                    'updated_at'    => now()
-                ]);
+                $ticket->status = 'booked';
+                $ticket->booking_id = $booking->id;
+                $ticket->ticket_number = Str::upper(Str::random(8));
+                $ticket->save();
             }
 
             DB::commit();
