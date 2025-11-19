@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wibufest — Film Festival Jogja</title>
+  <title>Wiftix</title>
   <link rel="icon" href="{{ asset('favicon.ico') }}">
   <script>
     // Force dark mode permanently
@@ -63,10 +63,10 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
     <div class="text-center mb-12 space-y-4">
       <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 dark:from-red-400 dark:via-pink-400 dark:to-purple-400 bg-clip-text text-transparent animate-gradient">
-        Wibufest Film Festival
+        Wibufest Nobar Film
       </h1>
       <p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-        Nikmati pengalaman sinema terbaik di Jogja. Pilih filmmu dan pesan kursi sekarang!
+        Nikmati pengalaman sinema bersama sesama pecinta anime.
       </p>
     </div>
 

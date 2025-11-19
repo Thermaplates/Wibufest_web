@@ -101,7 +101,7 @@
       <div class="glass-card">
         <h2 class="text-lg font-semibold mb-4">Denah Kursi</h2>
         <div class="overflow-x-auto">
-          <img src="{{ asset('images/denah.jpg') }}" alt="Denah Kursi" class="w-full rounded-lg border border-gray-200 dark:border-gray-700 mb-3">
+          <img src="{{ asset('images/denah1.jpg') }}" alt="Denah Kursi" class="w-full rounded-lg border border-gray-200 dark:border-gray-700 mb-3">
         </div>
         <p class="text-sm text-gray-600 dark:text-gray-400">
           💡 Tips: Gunakan Ctrl/Cmd atau Shift untuk memilih beberapa kursi sekaligus
