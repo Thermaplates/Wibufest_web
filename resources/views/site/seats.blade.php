@@ -128,6 +128,9 @@
             Reset Pilihan
           </button>
         </div>
+        @error('seats')
+          <p class="text-sm text-red-400 mt-2">{{ $message }}</p>
+        @enderror
       </div>
 
       <!-- Personal Info -->
@@ -136,16 +139,22 @@
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-300">Nama Lengkap</label>
-          <input type="text" name="name" placeholder="Contoh: John Doe"
+          <input type="text" name="name" value="{{ old('name') }}" placeholder="Contoh: John Doe"
             style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #4b5563; border-radius: 0.875rem; background-color: #111827 !important; color: #ffffff !important; font-size: 0.9375rem; font-weight: 500; box-shadow: 0 2px 4px rgba(0,0,0,0.4);"
             required>
+          @error('name')
+            <p class="text-sm text-red-400 mt-2">{{ $message }}</p>
+          @enderror
         </div>
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-300">Email</label>
-          <input type="email" name="email" placeholder="email@example.com"
+          <input type="email" name="email" value="{{ old('email') }}" placeholder="email@example.com"
             style="width: 100%; padding: 0.875rem 1.125rem; border: 2px solid #4b5563; border-radius: 0.875rem; background-color: #111827 !important; color: #ffffff !important; font-size: 0.9375rem; font-weight: 500; box-shadow: 0 2px 4px rgba(0,0,0,0.4);"
             required>
+          @error('email')
+            <p class="text-sm text-red-400 mt-2">{{ $message }}</p>
+          @enderror
         </div>
       </div>
 
@@ -164,12 +173,15 @@
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-300">Upload Bukti Pembayaran</label>
-          <input id="paymentScreenshot" type="file" name="payment_screenshot" accept="image/jpeg,image/jpg,image/png" capture="environment" required
+          <input id="paymentScreenshot" type="file" name="payment_screenshot" accept="image/*" capture="environment" required
             style="width: 100%; padding: 0.625rem 0.875rem; border: 2px solid #4b5563; border-radius: 0.875rem; background-color: #111827 !important; color: #ffffff !important; font-size: 0.9375rem; box-shadow: 0 2px 4px rgba(0,0,0,0.4); cursor: pointer;">
           <p id="fileHelp" class="text-xs text-gray-400 mt-2">
-            Format: JPG, JPEG, PNG • Max: 5 MB
+            Format: JPG, JPEG, PNG • Max: 10 MB
           </p>
           <p id="fileError" class="text-sm text-red-400 mt-2 hidden" role="alert" aria-live="polite"></p>
+          @error('payment_screenshot')
+            <p class="text-sm text-red-400 mt-2">{{ $message }}</p>
+          @enderror
         </div>
       </div>
 
@@ -214,8 +226,8 @@
       select.addEventListener('change', update);
       update();
 
-      // Validasi ukuran file (maks 5 MB)
-      const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+      // Validasi ukuran file (maks 10 MB untuk mobile)
+      const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
       const fileInput = document.getElementById('paymentScreenshot');
       const fileError = document.getElementById('fileError');
       const submitBtn = document.getElementById('submitButton');
@@ -237,15 +249,17 @@
           clearFileError();
           if (!fileInput.files || !fileInput.files[0]) return;
           const f = fileInput.files[0];
+          
+          console.log('File selected:', f.name, 'Size:', f.size, 'Type:', f.type);
+          
           if (f.size > MAX_BYTES) {
-            showFileError('File terlalu besar. Maksimum 5 MB. Silakan pilih file lain.');
+            showFileError('File terlalu besar. Maksimum 10 MB. Silakan pilih file lain.');
             fileInput.value = '';
             return;
           }
-          // opsional: periksa tipe mime dasar
-          const allowed = ['image/jpeg','image/png','image/jpg'];
-          if (!allowed.includes(f.type)) {
-            showFileError('Format tidak didukung. Gunakan .jpg atau .png.');
+          // Terima semua tipe image untuk mobile compatibility
+          if (!f.type.startsWith('image/')) {
+            showFileError('File harus berupa gambar.');
             fileInput.value = '';
             return;
           }
@@ -255,10 +269,30 @@
 
       if (form) {
         form.addEventListener('submit', (e) => {
-          if (fileInput && fileInput.files && fileInput.files[0] && fileInput.files[0].size > MAX_BYTES) {
+          // Validasi kursi dipilih
+          const selectedSeats = select.selectedOptions.length;
+          if (selectedSeats === 0) {
             e.preventDefault();
-            showFileError('File terlalu besar. Maksimum 5 MB.');
+            alert('Pilih minimal 1 kursi!');
+            return false;
           }
+          
+          // Validasi file
+          if (!fileInput.files || !fileInput.files[0]) {
+            e.preventDefault();
+            alert('Upload bukti pembayaran!');
+            return false;
+          }
+          
+          if (fileInput.files[0].size > MAX_BYTES) {
+            e.preventDefault();
+            showFileError('File terlalu besar. Maksimum 10 MB.');
+            return false;
+          }
+          
+          // Show loading
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '⏳ Memproses...';
         });
       }
 

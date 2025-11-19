@@ -13,41 +13,53 @@ class BookingController extends Controller
 {
     public function store(Request $request)
     {
-        $request->validate([
+        // Validasi dengan custom messages
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'film_id' => 'required|exists:films,id',
             'seats' => 'required|array|min:1',
             'seats.*' => 'required|string',
-            'payment_screenshot' => 'required|image|mimes:jpg,jpeg,png|max:5120', // 5 MB
+            'payment_screenshot' => 'required|image|mimes:jpg,jpeg,png|max:10240', // Naikkan jadi 10MB untuk mobile
+        ], [
+            'payment_screenshot.required' => 'Bukti pembayaran harus diupload',
+            'payment_screenshot.image' => 'File harus berupa gambar',
+            'payment_screenshot.mimes' => 'Format gambar harus JPG, JPEG, atau PNG',
+            'payment_screenshot.max' => 'Ukuran gambar maksimal 10 MB',
+            'seats.required' => 'Pilih minimal 1 kursi',
+            'seats.min' => 'Pilih minimal 1 kursi',
         ]);
 
         DB::beginTransaction();
         try {
             $booking = Booking::create([
-                'name'         => $request->name,
-                'email'        => $request->email,
-                'film_id'      => $request->film_id,
+                'name'         => $validated['name'],
+                'email'        => $validated['email'],
+                'film_id'      => $validated['film_id'],
                 'payment_status' => 'pending',
                 'status'         => 'active',
             ]);
 
-            // simpan file
-            $path = $request->file('payment_screenshot')->store('payments', 'public');
-
-            $booking->payment_screenshot = $path;
-            $booking->save();
+            // Simpan file dengan error handling
+            if ($request->hasFile('payment_screenshot') && $request->file('payment_screenshot')->isValid()) {
+                $path = $request->file('payment_screenshot')->store('payments', 'public');
+                $booking->payment_screenshot = $path;
+                $booking->save();
+            } else {
+                DB::rollBack();
+                return back()->withInput()->with('error', 'File bukti pembayaran tidak valid atau corrupt.');
+            }
 
             // Tandai kursi sebagai booked
-            foreach($request->seats as $seat){
+            foreach($validated['seats'] as $seat){
                 $ticket = Ticket::where('seat_number', $seat)
-                                ->where('film_id', $request->film_id)
+                                ->where('film_id', $validated['film_id'])
                                 ->lockForUpdate()
                                 ->first();
 
                 if(!$ticket || $ticket->status === 'booked'){
                     DB::rollBack();
-                    return back()->with('error', 'Kursi '.$seat.' sudah dibooking orang lain.');
+                    return back()->withInput()->with('error', 'Kursi '.$seat.' sudah dibooking orang lain.');
                 }
 
                 $ticket->status = 'booked';
@@ -57,10 +69,11 @@ class BookingController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('home')->with('success','Booking berhasil, tunggu konfirmasi admin.');
+            return redirect()->route('home')->with('success','Booking berhasil! Tunggu konfirmasi admin via email.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error','Error: '.$e->getMessage());
+            \Log::error('Booking error: ' . $e->getMessage());
+            return back()->withInput()->with('error','Gagal menyimpan booking. Silakan coba lagi. Error: '.$e->getMessage());
         }
     }
 }
