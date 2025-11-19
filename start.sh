@@ -17,6 +17,10 @@ chmod -R 775 storage bootstrap/cache
 echo "Running migrations..."
 php artisan migrate --force --no-interaction
 
+# Run seeder for default film
+echo "Seeding default film..."
+php artisan db:seed --class=DefaultFilmSeeder --force || echo "Seeder already run or failed"
+
 # Create storage link
 echo "Creating storage link..."
 php artisan storage:link --force || true
