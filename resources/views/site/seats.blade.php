@@ -164,7 +164,7 @@
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-300">Upload Bukti Pembayaran</label>
-          <input id="paymentScreenshot" type="file" name="payment_screenshot" accept="image/*" required
+          <input id="paymentScreenshot" type="file" name="payment_screenshot" accept="image/jpeg,image/jpg,image/png" capture="environment" required
             style="width: 100%; padding: 0.625rem 0.875rem; border: 2px solid #4b5563; border-radius: 0.875rem; background-color: #111827 !important; color: #ffffff !important; font-size: 0.9375rem; box-shadow: 0 2px 4px rgba(0,0,0,0.4); cursor: pointer;">
           <p id="fileHelp" class="text-xs text-gray-400 mt-2">
             Format: JPG, JPEG, PNG • Max: 5 MB

@@ -78,8 +78,32 @@
     <!-- Bookings Table -->
     <div class="glass-card overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
-        <h2 class="text-xl font-semibold">Daftar Booking</h2>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total: {{ count($bookings) }} booking</p>
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-xl font-semibold">Daftar Booking</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total: {{ count($bookings) }} booking</p>
+          </div>
+          <div class="text-right">
+            <p class="text-sm text-gray-600 dark:text-gray-400">Total Pendapatan</p>
+            <p class="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 dark:from-red-400 dark:to-pink-400 bg-clip-text text-transparent">
+              @php
+                $totalRevenue = 0;
+                foreach($bookings as $b) {
+                  $filmPrice = $b->film->price ?? 0;
+                  foreach($b->tickets as $t) {
+                    // Couple seat harganya 2x
+                    if(str_contains($t->seat_number, 'Couple Set')) {
+                      $totalRevenue += $filmPrice * 2;
+                    } else {
+                      $totalRevenue += $filmPrice;
+                    }
+                  }
+                }
+              @endphp
+              Rp {{ number_format($totalRevenue, 0, ',', '.') }}
+            </p>
+          </div>
+        </div>
       </div>
 
       <div class="overflow-x-auto">

@@ -155,7 +155,7 @@ class AdminController extends Controller
         abort(404);
     }
 
-    // Hapus booking & kosongkan kursi
+    // Hapus booking & kosongkan kursi + auto decrement ID
     public function deleteBooking($id)
     {
         DB::transaction(function() use ($id) {
@@ -169,9 +169,28 @@ class AdminController extends Controller
             }
 
             $booking->delete();
+
+            // Auto decrement booking IDs
+            $bookingsToUpdate = Booking::where('id', '>', $id)->orderBy('id')->get();
+            foreach ($bookingsToUpdate as $b) {
+                $oldId = $b->id;
+                $newId = $oldId - 1;
+                
+                // Update tickets terlebih dahulu
+                DB::table('tickets')
+                    ->where('booking_id', $oldId)
+                    ->update(['booking_id' => $newId]);
+                
+                // Update booking ID
+                DB::statement('UPDATE bookings SET id = ? WHERE id = ?', [$newId, $oldId]);
+            }
+
+            // Reset auto increment
+            $maxId = Booking::max('id') ?? 0;
+            DB::statement('ALTER TABLE bookings AUTO_INCREMENT = ' . ($maxId + 1));
         });
 
-        return redirect()->route('admin.dashboard')->with('success','Booking dihapus.');
+        return redirect()->route('admin.dashboard')->with('success','Booking dihapus dan ID diperbarui.');
     }
 
     // Hapus semua booking & reset kursi + reset auto-increment
@@ -266,5 +285,26 @@ class AdminController extends Controller
         $film->save();
 
         return redirect()->route('admin.films')->with('success','Film diperbarui.');
+    }
+
+    // Hapus film
+    public function deleteFilm($id)
+    {
+        DB::transaction(function() use ($id) {
+            $film = Film::findOrFail($id);
+            
+            // Hapus poster jika ada
+            if ($film->poster && file_exists(public_path($film->poster))) {
+                unlink(public_path($film->poster));
+            }
+            
+            // Hapus semua tiket terkait
+            Ticket::where('film_id', $id)->delete();
+            
+            // Hapus film
+            $film->delete();
+        });
+
+        return redirect()->route('admin.films')->with('success','Film berhasil dihapus.');
     }
 }

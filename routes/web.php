@@ -27,6 +27,7 @@ Route::prefix('admin')->middleware('admin.password')->group(function () {
     Route::get('/films', [AdminController::class,'films'])->name('admin.films');
     Route::post('/films/store', [AdminController::class, 'storeFilm'])->name('admin.films.store');
     Route::post('/films/update', [AdminController::class,'updateFilm'])->name('admin.films.update');
+    Route::post('/films/{id}/delete', [AdminController::class, 'deleteFilm'])->name('admin.films.delete');
 });
 
 // Fallback untuk URL yang tidak dikenal
