@@ -1,5 +1,7 @@
 [build]
-builder = "nixpacks"
+builder = "NIXPACKS"
 
-[start]
-cmd = "bash start.sh"
+[deploy]
+startCommand = "bash start.sh"
+healthcheckPath = "/"
+healthcheckTimeout = 100

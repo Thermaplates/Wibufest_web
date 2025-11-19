@@ -1,18 +1,26 @@
 #!/bin/bash
+set -e
+
+echo "Starting deployment..."
 
 # Create required directories
+echo "Creating directories..."
 mkdir -p storage/framework/{sessions,views,cache/data}
 mkdir -p storage/logs
 mkdir -p bootstrap/cache
 
 # Set permissions
+echo "Setting permissions..."
 chmod -R 775 storage bootstrap/cache
 
 # Run migrations
-php artisan migrate --force
+echo "Running migrations..."
+php artisan migrate --force --no-interaction
 
 # Create storage link
-php artisan storage:link || true
+echo "Creating storage link..."
+php artisan storage:link --force || true
 
+echo "Starting server on port ${PORT:-8000}..."
 # Start PHP server
-php -S 0.0.0.0:${PORT:-8000} -t public
+exec php -S 0.0.0.0:${PORT:-8000} -t public
