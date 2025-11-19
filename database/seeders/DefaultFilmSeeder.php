@@ -19,7 +19,7 @@ class DefaultFilmSeeder extends Seeder
             // Buat film default
             $film = Film::create([
                 'title' => 'Jujutsu Kaisen Movie Shibuya Incident x Culling Game',
-                'price' => 50000,
+                'price' => 45000,
                 'poster' => 'images/poster1.jpg',
                 'is_active' => true,
             ]);

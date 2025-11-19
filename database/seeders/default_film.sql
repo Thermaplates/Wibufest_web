@@ -5,7 +5,7 @@
 INSERT INTO `films` (`title`, `price`, `poster`, `is_active`, `created_at`, `updated_at`)
 VALUES (
     'Jujutsu Kaisen Movie Shibuya Incident x Culling Game',
-    50000,
+    45000,
     'images/poster1.jpg',
     1,
     NOW(),

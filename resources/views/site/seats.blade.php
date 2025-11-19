@@ -193,10 +193,22 @@
       }
 
       function update(){
-        const count = [...select.selectedOptions].length;
-        const total = count * pricePerSeat;
+        const selectedSeats = [...select.selectedOptions];
+        const count = selectedSeats.length;
+        
+        // Hitung total dengan harga 2x untuk couple seat
+        let total = 0;
+        selectedSeats.forEach(option => {
+          const seatName = option.value;
+          // Check if it's a couple seat (contains "Couple Set")
+          if (seatName.includes('Couple Set')) {
+            total += pricePerSeat * 2; // Couple seat harganya 2x
+          } else {
+            total += pricePerSeat;
+          }
+        });
+        
         info.textContent = count ? `Terpilih ${count} kursi — Total: ${formatCurrency(total)}` : 'Total: -';
-
       }
 
       select.addEventListener('change', update);
