@@ -1,0 +1,117 @@
+/* Custom Input Styles - Force Dark Mode */
+
+/* All text inputs */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+textarea,
+select {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+    border: 2px solid #4b5563 !important;
+    border-radius: 0.875rem !important;
+    padding: 0.875rem 1.125rem !important;
+    font-size: 0.9375rem !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+    transition: all 0.2s ease !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #f87171 !important;
+    background-color: #1f2937 !important;
+    box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.25), 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+    outline: none !important;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="number"]::placeholder,
+input[type="password"]::placeholder,
+textarea::placeholder {
+    color: #6b7280 !important;
+    opacity: 0.8 !important;
+}
+
+/* File inputs */
+input[type="file"] {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+    border: 2px solid #4b5563 !important;
+    border-radius: 0.875rem !important;
+    padding: 0.625rem 0.875rem !important;
+    cursor: pointer !important;
+}
+
+input[type="file"]::file-selector-button {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.625rem !important;
+    font-weight: 600 !important;
+    margin-right: 1rem !important;
+    cursor: pointer !important;
+}
+
+/* Select dropdowns */
+select {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+    border: 2px solid #4b5563 !important;
+    padding: 0.75rem 1rem !important;
+}
+
+select option {
+    background-color: #1f2937 !important;
+    color: #ffffff !important;
+    padding: 0.5rem !important;
+}
+
+select option:disabled {
+    color: #6b7280 !important;
+    text-decoration: line-through !important;
+}
+
+/* Textarea specific */
+textarea {
+    resize: vertical !important;
+    min-height: 120px !important;
+    font-family: monospace !important;
+}
+
+/* Remove number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+    display: none !important;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+}
+
+/* Number input specific styling */
+input[type="number"] {
+    text-align: left !important;
+    letter-spacing: 0.025em !important;
+}
+
+/* Disabled state */
+input:disabled,
+textarea:disabled,
+select:disabled {
+    background-color: #0f172a !important;
+    color: #6b7280 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}

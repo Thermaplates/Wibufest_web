@@ -1,105 +1,143 @@
 <!doctype html>
-<html>
+<html lang="id">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wibufest — Films</title>
+  <title>Wibufest — Film Festival Jogja</title>
   <link rel="icon" href="{{ asset('favicon.ico') }}">
   <script>
-    // Early theme init to prevent flash mismatch
-    (function(){
-      const saved = localStorage.getItem('theme');
-      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    })();
+    // Force dark mode permanently
+    document.documentElement.classList.add('dark');
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    // enable dark mode class strategy
-    tailwind.config = { darkMode: 'class' }
-  </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset('css/app.css') }}">
   <style>
     body { font-family: 'Inter', sans-serif; }
     ::selection { background: #ef4444; color: white; }
     .dark ::selection { background: #f87171; color: #111827; }
   </style>
 </head>
-<body class="bg-white dark:bg-gray-950 min-h-screen p-6 md:p-12 text-gray-800 dark:text-gray-100 transition-colors">
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors">
   @include('partials.navbar')
 
-  {{-- Flash modal untuk menampilkan pesan success/error setelah submit --}}
+  {{-- Flash modal --}}
   @if(session('success') || session('error'))
-    <div id="flashModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div class="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 mx-4">
-        <h3 class="text-lg font-semibold mb-2 text-gray-900">
-          {{ session('success') ? 'Berhasil' : 'Terjadi Kesalahan' }}
-        </h3>
-        <p class="text-sm text-gray-700">
-          {{ session('success') ?? session('error') }}
-        </p>
+    <div id="flashModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div class="glass-card max-w-md w-full p-6 mx-4 animate-slide-up">
+        <div class="flex items-start space-x-3">
+          <div class="flex-shrink-0">
+            @if(session('success'))
+              <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            @else
+              <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+            @endif
+          </div>
+          <div class="flex-1">
+            <h3 class="text-lg font-semibold mb-1 text-gray-900 dark:text-gray-100">
+              {{ session('success') ? 'Berhasil!' : 'Terjadi Kesalahan' }}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ session('success') ?? session('error') }}
+            </p>
+          </div>
+        </div>
         <div class="mt-4 flex justify-end">
-          <button onclick="closeFlash()" class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700">Tutup</button>
+          <button onclick="closeFlash()" class="btn-primary">Tutup</button>
         </div>
       </div>
     </div>
   @endif
 
-  <div class="max-w-6xl mx-auto">
-    <h1 class="text-3xl md:text-4xl font-bold mb-8 text-red-600 dark:text-red-400">🎬 Pilih Film</h1>
+  <!-- Hero Section -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <div class="text-center mb-12 space-y-4">
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 dark:from-red-400 dark:via-pink-400 dark:to-purple-400 bg-clip-text text-transparent animate-gradient">
+        Wibufest Film Festival
+      </h1>
+      <p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+        Nikmati pengalaman sinema terbaik di Jogja. Pilih filmmu dan pesan kursi sekarang!
+      </p>
+    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Films Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
       @foreach($films as $f)
-      <div class="bg-white dark:bg-gray-900 rounded-xl shadow-md hover:shadow-lg border border-gray-200 dark:border-gray-800 transition-all duration-300 overflow-hidden">
-        <a href="{{ route('film.seats', $f['id']) }}" class="block">
-          <!-- Poster: gunakan field poster jika ada, fallback ke placeholder -->
-          <img
-            src="{{ asset( $f['poster'] ?? 'images/poster.jpg' ) }}"
-            alt="{{ $f['title'] }} poster"
-            class="w-full h-auto object-contain"
-            loading="lazy"
-          >
-          <div class="p-6">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-50 mb-3">{{ $f['title'] }}</h2>
-            <p class="text-gray-600 dark:text-gray-300 mb-4">
-              Harga:
-              <span class="font-medium text-red-600 dark:text-red-400">Rp {{ number_format($f['price'],0,',','.') }}</span>
-            </p>
-            <span class="block w-full text-center px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200">
-              Pilih Kursi
-            </span>
+      <a href="{{ route('film.seats', $f['id']) }}" class="group">
+        <div class="film-card">
+          <!-- Poster -->
+          <div class="poster-container">
+            <img
+              src="{{ asset( $f['poster'] ?? 'images/poster.jpg' ) }}"
+              alt="{{ $f['title'] }}"
+              class="poster-image"
+              loading="lazy"
+            >
+            <div class="poster-overlay">
+              <span class="overlay-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+                Pilih Kursi
+              </span>
+            </div>
           </div>
-        </a>
-      </div>
+
+          <!-- Info -->
+          <div class="p-5 space-y-3">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-gray-50 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+              {{ $f['title'] }}
+            </h2>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-500 dark:text-gray-400">Harga</span>
+              <span class="text-xl font-bold text-red-600 dark:text-red-400">
+                Rp {{ number_format($f['price'],0,',','.') }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </a>
       @endforeach
     </div>
 
+    @if(count($films) === 0)
+    <div class="text-center py-16">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-800 mb-4">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+        </svg>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Belum Ada Film</h3>
+      <p class="text-gray-500 dark:text-gray-400">Film akan segera ditambahkan. Silakan cek kembali nanti!</p>
+    </div>
+    @endif
+  </div>
 
   <script>
     function closeFlash(){
       const el = document.getElementById('flashModal');
       if(!el) return;
-      // animasi fade out sederhana
-      el.style.transition = 'opacity .25s ease';
+      el.style.transition = 'opacity .3s ease';
       el.style.opacity = '0';
-      setTimeout(()=> el.remove(), 250);
+      setTimeout(()=> el.remove(), 300);
     }
 
     document.addEventListener('DOMContentLoaded', ()=>{
-      // jika ada flash modal tampilkan dan auto-close
       const el = document.getElementById('flashModal');
       if(!el) return;
-      // pastikan modal terlihat (jika ada class hidden)
       el.classList.remove('hidden');
       el.classList.add('flex');
-      // auto close setelah 5 detik
       setTimeout(closeFlash, 5000);
-      // juga beri fokus tombol tutup jika ada
-      const btn = el.querySelector('button');
-      if(btn) btn.focus();
     });
   </script>
 </body>

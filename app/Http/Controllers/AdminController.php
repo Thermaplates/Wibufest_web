@@ -28,7 +28,7 @@ class AdminController extends Controller
 
         $expected = (string) config('admin.password');
         if (!is_string($expected) || strlen((string)$expected) === 0) {
-            $expected = 'wongislamjumatan';
+            $expected = 'gedebongpisanghitam';
         }
 
         if (hash_equals((string)$expected, (string)$request->input('password'))) {
@@ -204,10 +204,10 @@ class AdminController extends Controller
     {
         $r->validate([
             'title'  => 'required|string|max:255',
-            'price'  => 'required|numeric',
+            'price'  => 'required|numeric|min:0',
             'cover'  => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // 5 MB
             'seats'  => 'nullable|string', // daftar nomor kursi, dipisah koma atau newline
-            'is_active' => 'nullable|boolean',
+            'is_active' => 'nullable',
         ]);
 
         DB::beginTransaction();
@@ -222,15 +222,15 @@ class AdminController extends Controller
             }
 
             $film = Film::create([
-                'title'     => $r->title,
-                'price'     => $r->price,
+                'title'     => $r->input('title'),
+                'price'     => $r->input('price'),
                 'poster'    => $coverPath, // sesuaikan nama kolom (poster) di model/migrasi
-                'is_active' => $r->has('is_active') ? 1 : 0,
+                'is_active' => $r->input('is_active') == '1' ? 1 : 0,
             ]);
 
             // Buat tiket/kursi jika ada input seats (pisah dengan koma atau newline)
             if ($r->filled('seats')) {
-                $items = preg_split('/[\r\n,]+/', $r->seats);
+                $items = preg_split('/[\r\n,]+/', $r->input('seats'));
                 foreach ($items as $it) {
                     $seat = trim($it);
                     if (!$seat) continue;
@@ -246,7 +246,7 @@ class AdminController extends Controller
             return redirect()->route('admin.films')->with('success', 'Film dan kursi berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menambahkan film: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Gagal menambahkan film: ' . $e->getMessage());
         }
     }
 
@@ -254,13 +254,15 @@ class AdminController extends Controller
     public function updateFilm(Request $r)
     {
         $r->validate([
-            'price'=>'required|numeric',
+            'id' => 'required|exists:films,id',
+            'title' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
         ]);
 
-        $film = Film::findOrFail($r->id);
-        $film->title = $r->title;
-        $film->price = $r->price;
-        $film->is_active = $r->has('is_active') ? 1 : 0;
+        $film = Film::findOrFail($r->input('id'));
+        $film->title = $r->input('title');
+        $film->price = $r->input('price');
+        $film->is_active = $r->input('is_active') == '1' ? 1 : 0;
         $film->save();
 
         return redirect()->route('admin.films')->with('success','Film diperbarui.');

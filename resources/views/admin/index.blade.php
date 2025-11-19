@@ -1,24 +1,19 @@
 <!doctype html>
-<html>
+<html lang="id">
 <head>
 <meta charset="utf-8">
-<title>Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Wibufest</title>
 <link rel="icon" href="{{ asset('favicon.ico') }}">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>
-  (function(){
-    const saved = localStorage.getItem('theme');
-    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  })();
-  </script>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = { darkMode: 'class' }
+  // Force dark mode permanently
+  document.documentElement.classList.add('dark');
 </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class' }</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('css/app.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <style>
   body { font-family: 'Inter', sans-serif; }
@@ -26,69 +21,144 @@
   .dark ::selection { background: #f87171; color: #111827; }
 </style>
 </head>
-<body class="p-6 bg-gray-50 dark:bg-gray-950 dark:text-gray-100 transition-colors">
-    @include('partials.navbar')
-  <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-bold">Admin — Bookings</h1>
-    <div class="flex items-center space-x-2">
-      <a href="{{ route('admin.films') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none">
-        Tambah / Kelola Film
-      </a>
-      <form method="POST" action="{{ route('admin.bookings.clear') }}" onsubmit="return confirm('Hapus semua booking dan reset ID?');">
-        @csrf
-        <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded focus:outline-none">Hapus Semua</button>
-      </form>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors">
+  @include('partials.navbar')
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-red-600 to-pink-600 dark:from-red-400 dark:to-pink-400 bg-clip-text text-transparent">
+            Dashboard Admin
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400 mt-2">Kelola booking dan film festival</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <a href="{{ route('admin.films') }}" class="btn-primary-sm inline-flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Kelola Film
+          </a>
+          <form method="POST" action="{{ route('admin.bookings.clear') }}" onsubmit="return confirm('Hapus semua booking dan reset ID?');" class="inline">
+            @csrf
+            <button type="submit" class="btn-secondary inline-flex items-center gap-2 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-200 dark:hover:bg-red-900/30">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Hapus Semua
+            </button>
+          </form>
+          <form method="POST" action="{{ route('admin.logout') }}" class="inline">
+            @csrf
+            <button type="submit" class="btn-secondary inline-flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert -->
+    @if(session('success'))
+      <div class="glass-card bg-green-50/50 dark:bg-green-900/10 border-green-200 dark:border-green-800 mb-6 animate-slide-up">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <p class="text-green-800 dark:text-green-300">{{ session('success') }}</p>
+        </div>
+      </div>
+    @endif
+
+    <!-- Bookings Table -->
+    <div class="glass-card overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
+        <h2 class="text-xl font-semibold">Daftar Booking</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total: {{ count($bookings) }} booking</p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50/50 dark:bg-gray-800/50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">ID</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Nama</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Email</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Kursi</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200/50 dark:divide-gray-700/50">
+            @forelse($bookings as $b)
+            <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+              <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">#{{ $b->id }}</td>
+              <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{{ $b->name }}</td>
+              <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ $b->email }}</td>
+              <td class="px-4 py-3 text-sm">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
+                  {{ $b->tickets?->pluck('seat_number')->join(', ') ?? '-' }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-sm space-x-2">
+                <button onclick="showBooking({{ $b->id }})" class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-xs font-medium">
+                  <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  Lihat
+                </button>
+                <form method="POST" action="{{ route('admin.booking.delete', $b->id) }}" style="display:inline" onsubmit="return confirm('Hapus booking ini?')">
+                  @csrf
+                  <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-xs font-medium">
+                    <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Hapus
+                  </button>
+                </form>
+              </td>
+            </tr>
+            @empty
+            <tr>
+              <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                Belum ada booking
+              </td>
+            </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  @if(session('success'))
-    <div class="p-2 bg-green-200">{{ session('success') }}</div>
-  @endif
-
-  <table class="w-full mt-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-    <thead class="bg-gray-100 dark:bg-gray-800">
-      <tr>
-        <th class="p-2 border">ID</th>
-        <th class="p-2 border">Nama</th>
-        <th class="p-2 border">Email</th>
-        <th class="p-2 border">Seats</th>
-        <th class="p-2 border">Aksi</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach($bookings as $b)
-      <tr class="border-t border-gray-200 dark:border-gray-800">
-        <td class="p-2 border border-gray-200 dark:border-gray-800">{{ $b->id }}</td>
-        <td class="p-2 border border-gray-200 dark:border-gray-800">{{ $b->name }}</td>
-        <td class="p-2 border border-gray-200 dark:border-gray-800">{{ $b->email }}</td>
-        <td class="p-2 border border-gray-200 dark:border-gray-800">{{ $b->tickets?->pluck('seat_number')->join(', ') ?? '-' }}</td>
-        <td class="p-2 border border-gray-200 dark:border-gray-800 space-x-2">
-          <button onclick="showBooking({{ $b->id }})"
-                  class="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
-            Lihat Bukti
-          </button>
-          <form method="POST" action="{{ route('admin.booking.delete', $b->id) }}" style="display:inline">
-            @csrf
-            <button type="submit" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded transition-colors">
-              Hapus/Set Selesai
-            </button>
-          </form>
-        </td>
-      </tr>
-      @endforeach
-    </tbody>
-  </table>
-
   <!-- Modal -->
-  <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white dark:bg-gray-900 p-4 rounded max-w-lg w-full border border-gray-200 dark:border-gray-800">
-      <h3 id="mname" class="font-bold"></h3>
-      <p id="memail" class="text-sm text-gray-600 dark:text-gray-300"></p>
-      <div id="mimgwrap" class="mt-3"></div>
-      <button onclick="closeModal()"
-              class="mt-3 px-3 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded transition-colors">
-        Tutup
-      </button>
+  <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/60 backdrop-blur-sm z-50">
+    <div class="glass-card max-w-2xl w-full mx-4 animate-slide-up">
+      <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-200/50 dark:border-gray-700/50">
+        <div>
+          <h3 id="mname" class="text-xl font-bold text-gray-900 dark:text-gray-100"></h3>
+          <p id="memail" class="text-sm text-gray-600 dark:text-gray-400 mt-1"></p>
+        </div>
+        <button onclick="closeModal()" class="btn-icon">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div id="mimgwrap" class="mb-4"></div>
+
+      <div class="flex justify-end">
+        <button onclick="closeModal()" class="btn-primary">Tutup</button>
+      </div>
     </div>
   </div>
 
@@ -96,14 +166,14 @@
 function showBooking(id){
   axios.get('/admin/booking/'+id).then(r=>{
     const d = r.data;
-    document.getElementById('mname').innerText = d.name + ' — #' + d.id;
-    document.getElementById('memail').innerText = d.email + ' | Seats: ' + d.tickets.join(', ');
+    document.getElementById('mname').innerText = d.name + ' (ID: #' + d.id + ')';
+    document.getElementById('memail').innerText = d.email + ' • Kursi: ' + d.tickets.join(', ');
     const wrap = document.getElementById('mimgwrap');
 
     if(d.has_payment){
-      wrap.innerHTML = '<img src="/admin/booking/'+id+'/payment" class="max-w-full border rounded" />';
+      wrap.innerHTML = '<div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700"><img src="/admin/booking/'+id+'/payment" class="w-full h-auto" /></div>';
     } else {
-      wrap.innerHTML = '<p class="text-red-500">Tidak ada bukti pembayaran</p>';
+      wrap.innerHTML = '<div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"><svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><p class="text-red-700 dark:text-red-300">Tidak ada bukti pembayaran</p></div>';
     }
 
     const modal = document.getElementById('modal');
@@ -113,7 +183,7 @@ function showBooking(id){
 }
 
 function closeModal(){
-  const modal=document.getElementById('modal');
+  const modal = document.getElementById('modal');
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 }

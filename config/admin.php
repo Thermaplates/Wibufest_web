@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'password' => env('ADMIN_PASSWORD', env('APP_KEY', 'admin123')),
+    'password' => env('ADMIN_PASSWORD', 'gedebongpisanghitam'),
 ];
 
 
