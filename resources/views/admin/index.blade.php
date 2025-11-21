@@ -9,12 +9,13 @@
   // Force dark mode permanently
   document.documentElement.classList.add('dark');
 </script>
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com" defer></script>
 <script>tailwind.config = { darkMode: 'class' }</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
 <style>
   body { font-family: 'Inter', sans-serif; }
   ::selection { background: #ef4444; color: white; }
@@ -150,12 +151,12 @@
   </div>
 
   <!-- Modal -->
-  <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/60 backdrop-blur-sm z-50">
-    <div class="glass-card max-w-2xl w-full mx-4 animate-slide-up">
-      <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-200/50 dark:border-gray-700/50">
+  <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/60 backdrop-blur-sm z-50" onclick="if(event.target===this) closeModal()">
+    <div class="glass-card max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto animate-slide-up">
+      <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm z-10">
         <div>
-          <h3 id="mname" class="text-xl font-bold text-gray-900 dark:text-gray-100"></h3>
-          <p id="memail" class="text-sm text-gray-600 dark:text-gray-400 mt-1"></p>
+          <h3 id="mname" class="text-lg font-bold text-gray-900 dark:text-gray-100"></h3>
+          <p id="memail" class="text-xs text-gray-600 dark:text-gray-400 mt-1"></p>
         </div>
         <button onclick="closeModal()" class="btn-icon">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,7 +167,7 @@
 
       <div id="mimgwrap" class="mb-4"></div>
 
-      <div class="flex justify-end">
+      <div class="flex justify-end sticky bottom-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
         <button onclick="closeModal()" class="btn-primary">Tutup</button>
       </div>
     </div>
@@ -181,7 +182,7 @@ function showBooking(id){
     const wrap = document.getElementById('mimgwrap');
 
     if(d.has_payment){
-      wrap.innerHTML = '<div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700"><img src="/admin/booking/'+id+'/payment" class="w-full h-auto" /></div>';
+      wrap.innerHTML = '<div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700"><img src="/admin/booking/'+id+'/payment" class="w-full h-auto max-h-[60vh] object-contain mx-auto" loading="lazy" /></div>';
     } else {
       wrap.innerHTML = '<div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"><svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><p class="text-red-700 dark:text-red-300">Tidak ada bukti pembayaran</p></div>';
     }
@@ -189,6 +190,7 @@ function showBooking(id){
     const modal = document.getElementById('modal');
     modal.classList.remove('hidden');
     modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
   });
 }
 
@@ -196,6 +198,7 @@ function closeModal(){
   const modal = document.getElementById('modal');
   modal.classList.add('hidden');
   modal.classList.remove('flex');
+  document.body.style.overflow = '';
 }
 </script>
 
