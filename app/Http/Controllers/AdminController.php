@@ -48,8 +48,25 @@ class AdminController extends Controller
     // Halaman utama admin: daftar booking
     public function index()
     {
-        $bookings = Booking::with('tickets')->orderBy('created_at','desc')->get();
-        return view('admin.index', compact('bookings'));
+        $bookings = Booking::with(['tickets', 'film'])->orderBy('created_at','desc')->get();
+        
+        // Hitung total pendapatan
+        $totalRevenue = 0;
+        foreach($bookings as $booking) {
+            if ($booking->film) {
+                $filmPrice = $booking->film->price;
+                foreach($booking->tickets as $ticket) {
+                    // Couple seat harganya 2x
+                    if(str_contains($ticket->seat_number, 'Couple Set')) {
+                        $totalRevenue += $filmPrice * 2;
+                    } else {
+                        $totalRevenue += $filmPrice;
+                    }
+                }
+            }
+        }
+        
+        return view('admin.index', compact('bookings', 'totalRevenue'));
     }
 
     // Detail booking untuk modal
@@ -155,12 +172,15 @@ class AdminController extends Controller
         abort(404);
     }
 
-    // Hapus booking & kosongkan kursi + auto decrement ID
+    // Hapus booking & kosongkan kursi
     public function deleteBooking($id)
     {
-        DB::transaction(function() use ($id) {
+        try {
+            DB::beginTransaction();
+            
             $booking = Booking::with('tickets')->findOrFail($id);
 
+            // Kosongkan kursi
             foreach ($booking->tickets as $t) {
                 $t->status = 'available';
                 $t->booking_id = null;
@@ -168,29 +188,16 @@ class AdminController extends Controller
                 $t->save();
             }
 
+            // Hapus booking
             $booking->delete();
 
-            // Auto decrement booking IDs
-            $bookingsToUpdate = Booking::where('id', '>', $id)->orderBy('id')->get();
-            foreach ($bookingsToUpdate as $b) {
-                $oldId = $b->id;
-                $newId = $oldId - 1;
-                
-                // Update tickets terlebih dahulu
-                DB::table('tickets')
-                    ->where('booking_id', $oldId)
-                    ->update(['booking_id' => $newId]);
-                
-                // Update booking ID
-                DB::statement('UPDATE bookings SET id = ? WHERE id = ?', [$newId, $oldId]);
-            }
-
-            // Reset auto increment
-            $maxId = Booking::max('id') ?? 0;
-            DB::statement('ALTER TABLE bookings AUTO_INCREMENT = ' . ($maxId + 1));
-        });
-
-        return redirect()->route('admin.dashboard')->with('success','Booking dihapus dan ID diperbarui.');
+            DB::commit();
+            return redirect()->route('admin.dashboard')->with('success','Booking berhasil dihapus.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Delete booking error: ' . $e->getMessage());
+            return redirect()->route('admin.dashboard')->with('error','Gagal menghapus booking: ' . $e->getMessage());
+        }
     }
 
     // Hapus semua booking & reset kursi + reset auto-increment

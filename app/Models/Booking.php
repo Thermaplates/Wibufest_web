@@ -23,4 +23,10 @@ class Booking extends Model
     {
         return $this->hasMany(Ticket::class, 'booking_id');
     }
+
+    // Relasi ke Film
+    public function film()
+    {
+        return $this->belongsTo(Film::class, 'film_id');
+    }
 }
