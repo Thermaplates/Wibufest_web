@@ -20,12 +20,12 @@ class BookingController extends Controller
             'film_id' => 'required|exists:films,id',
             'seats' => 'required|array|min:1',
             'seats.*' => 'required|string',
-            'payment_screenshot' => 'required|image|mimes:jpg,jpeg,png|max:10240', // Naikkan jadi 10MB untuk mobile
+            'payment_screenshot' => 'required|image|mimes:jpg,jpeg,png|max:5120', // 5MB setelah kompresi
         ], [
             'payment_screenshot.required' => 'Bukti pembayaran harus diupload',
             'payment_screenshot.image' => 'File harus berupa gambar',
             'payment_screenshot.mimes' => 'Format gambar harus JPG, JPEG, atau PNG',
-            'payment_screenshot.max' => 'Ukuran gambar maksimal 10 MB',
+            'payment_screenshot.max' => 'Ukuran gambar maksimal 5 MB',
             'seats.required' => 'Pilih minimal 1 kursi',
             'seats.min' => 'Pilih minimal 1 kursi',
         ]);

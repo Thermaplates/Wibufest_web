@@ -173,12 +173,15 @@
 
         <div>
           <label class="block mb-2 text-sm font-medium text-gray-300">Upload Bukti Pembayaran</label>
-          <input id="paymentScreenshot" type="file" name="payment_screenshot" accept="image/*" capture="environment" required
+          <input id="paymentScreenshot" type="file" name="payment_screenshot" accept="image/jpeg,image/jpg,image/png" required
             style="width: 100%; padding: 0.625rem 0.875rem; border: 2px solid #4b5563; border-radius: 0.875rem; background-color: #111827 !important; color: #ffffff !important; font-size: 0.9375rem; box-shadow: 0 2px 4px rgba(0,0,0,0.4); cursor: pointer;">
+          <!-- Hidden input untuk compressed image -->
+          <input type="hidden" id="compressedImage" name="compressed_image">
           <p id="fileHelp" class="text-xs text-gray-400 mt-2">
-            Format: JPG, JPEG, PNG • Max: 10 MB
+            Format: JPG, JPEG, PNG • Gambar akan otomatis dikompres
           </p>
           <p id="fileError" class="text-sm text-red-400 mt-2 hidden" role="alert" aria-live="polite"></p>
+          <p id="fileSuccess" class="text-sm text-green-400 mt-2 hidden" role="alert" aria-live="polite"></p>
           @error('payment_screenshot')
             <p class="text-sm text-red-400 mt-2">{{ $message }}</p>
           @enderror
@@ -226,44 +229,135 @@
       select.addEventListener('change', update);
       update();
 
-      // Validasi ukuran file (maks 10 MB untuk mobile)
-      const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+      // Kompresi gambar untuk mobile
       const fileInput = document.getElementById('paymentScreenshot');
       const fileError = document.getElementById('fileError');
+      const fileSuccess = document.getElementById('fileSuccess');
       const submitBtn = document.getElementById('submitButton');
       const form = document.getElementById('bookingForm');
 
       function showFileError(msg){
         fileError.textContent = msg;
         fileError.classList.remove('hidden');
+        fileSuccess.classList.add('hidden');
         submitBtn.disabled = true;
       }
-      function clearFileError(){
-        fileError.textContent = '';
+      
+      function showFileSuccess(msg){
+        fileSuccess.textContent = msg;
+        fileSuccess.classList.remove('hidden');
         fileError.classList.add('hidden');
         submitBtn.disabled = false;
       }
+      
+      function clearFileError(){
+        fileError.textContent = '';
+        fileError.classList.add('hidden');
+        fileSuccess.classList.add('hidden');
+        submitBtn.disabled = false;
+      }
+
+      // Fungsi untuk compress image
+      function compressImage(file, maxWidth = 1200, quality = 0.7) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          
+          reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              let width = img.width;
+              let height = img.height;
+              
+              // Resize jika terlalu besar
+              if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+              }
+              
+              canvas.width = width;
+              canvas.height = height;
+              
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              
+              // Convert to blob dengan kompresi
+              canvas.toBlob(
+                (blob) => {
+                  if (blob) {
+                    resolve(blob);
+                  } else {
+                    reject(new Error('Gagal mengkompress gambar'));
+                  }
+                },
+                'image/jpeg',
+                quality
+              );
+            };
+            
+            img.onerror = () => reject(new Error('Gagal load gambar'));
+          };
+          
+          reader.onerror = () => reject(new Error('Gagal membaca file'));
+        });
+      }
 
       if (fileInput) {
-        fileInput.addEventListener('change', () => {
+        fileInput.addEventListener('change', async () => {
           clearFileError();
           if (!fileInput.files || !fileInput.files[0]) return;
-          const f = fileInput.files[0];
           
-          console.log('File selected:', f.name, 'Size:', f.size, 'Type:', f.type);
+          const file = fileInput.files[0];
+          console.log('Original file:', file.name, 'Size:', (file.size / 1024 / 1024).toFixed(2) + ' MB');
           
-          if (f.size > MAX_BYTES) {
-            showFileError('File terlalu besar. Maksimum 10 MB. Silakan pilih file lain.');
+          // Validasi tipe file
+          if (!file.type.startsWith('image/')) {
+            showFileError('File harus berupa gambar (JPG, PNG, JPEG)');
             fileInput.value = '';
             return;
           }
-          // Terima semua tipe image untuk mobile compatibility
-          if (!f.type.startsWith('image/')) {
-            showFileError('File harus berupa gambar.');
+          
+          try {
+            // Tampilkan loading
+            showFileSuccess('⏳ Mengkompress gambar...');
+            submitBtn.disabled = true;
+            
+            // Compress image
+            const compressedBlob = await compressImage(file);
+            console.log('Compressed size:', (compressedBlob.size / 1024 / 1024).toFixed(2) + ' MB');
+            
+            // Validasi ukuran setelah kompresi (max 5MB)
+            if (compressedBlob.size > 5 * 1024 * 1024) {
+              showFileError('Gambar terlalu besar. Coba gambar dengan resolusi lebih kecil.');
+              fileInput.value = '';
+              return;
+            }
+            
+            // Simpan ukuran asli untuk display
+            const originalSize = (file.size / 1024 / 1024).toFixed(2);
+            const compressedSize = (compressedBlob.size / 1024 / 1024).toFixed(2);
+            
+            showFileSuccess(`✓ Gambar dikompres: ${originalSize} MB → ${compressedSize} MB`);
+            
+            // Create new File object dari blob
+            const compressedFile = new File([compressedBlob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+            
+            // Replace file input dengan compressed file
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(compressedFile);
+            fileInput.files = dataTransfer.files;
+            
+          } catch (error) {
+            console.error('Compression error:', error);
+            showFileError('Gagal mengkompress gambar. Silakan coba lagi.');
             fileInput.value = '';
-            return;
           }
-          clearFileError();
         });
       }
 
@@ -284,15 +378,16 @@
             return false;
           }
           
-          if (fileInput.files[0].size > MAX_BYTES) {
+          // Validasi ukuran maksimal 5MB setelah kompresi
+          if (fileInput.files[0].size > 5 * 1024 * 1024) {
             e.preventDefault();
-            showFileError('File terlalu besar. Maksimum 10 MB.');
+            showFileError('File terlalu besar setelah kompresi. Silakan pilih gambar lain.');
             return false;
           }
           
           // Show loading
           submitBtn.disabled = true;
-          submitBtn.innerHTML = '⏳ Memproses...';
+          submitBtn.innerHTML = '⏳ Mengirim booking...';
         });
       }
 
