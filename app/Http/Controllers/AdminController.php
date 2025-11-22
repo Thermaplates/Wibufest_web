@@ -46,9 +46,22 @@ class AdminController extends Controller
         return redirect()->route('admin.login');
     }
     // Halaman utama admin: daftar booking
-    public function index()
+    public function index(Request $request)
     {
-        $bookings = Booking::with(['tickets', 'film'])->orderBy('created_at','desc')->get();
+        $search = $request->input('search');
+        
+        // Query dengan search
+        $query = Booking::with(['tickets', 'film']);
+        
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('id', 'LIKE', "%{$search}%")
+                  ->orWhere('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+        
+        $bookings = $query->orderBy('created_at','desc')->get();
         
         // Hitung total pendapatan
         $totalRevenue = 0;
@@ -66,7 +79,7 @@ class AdminController extends Controller
             }
         }
         
-        return view('admin.index', compact('bookings', 'totalRevenue'));
+        return view('admin.index', compact('bookings', 'totalRevenue', 'search'));
     }
 
     // Detail booking untuk modal

@@ -79,7 +79,7 @@
     <!-- Bookings Table -->
     <div class="glass-card overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
-        <div class="flex justify-between items-start">
+        <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
           <div>
             <h2 class="text-xl font-semibold">Daftar Booking</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total: {{ count($bookings) }} booking</p>
@@ -90,6 +90,37 @@
               Rp {{ number_format($totalRevenue ?? 0, 0, ',', '.') }}
             </p>
           </div>
+        </div>
+
+        <!-- Search Form -->
+        <div class="mt-4">
+          <form method="GET" action="{{ route('admin.dashboard') }}" class="flex gap-2">
+            <div class="relative flex-1 max-w-md">
+              <input 
+                type="text" 
+                name="search" 
+                value="{{ $search ?? '' }}"
+                placeholder="Cari berdasarkan ID, nama, atau email..."
+                class="w-full pl-10 pr-4 py-2.5 text-sm border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <button type="submit" class="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              Cari
+            </button>
+            @if($search ?? false)
+              <a href="{{ route('admin.dashboard') }}" class="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg transition-colors inline-flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Reset
+              </a>
+            @endif
+          </form>
         </div>
       </div>
 
