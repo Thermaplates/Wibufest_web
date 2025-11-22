@@ -31,6 +31,11 @@ Route::prefix('admin')->middleware('admin.password')->group(function () {
     Route::post('/films/{id}/delete', [AdminController::class, 'deleteFilm'])->name('admin.films.delete');
 });
 
+
+// Route untuk test email
+use App\Http\Controllers\TestEmailController;
+Route::post('/test-email', [TestEmailController::class, 'sendTest']);
+
 // Fallback untuk URL yang tidak dikenal
 Route::fallback(function(){
     return redirect()->route('home');
