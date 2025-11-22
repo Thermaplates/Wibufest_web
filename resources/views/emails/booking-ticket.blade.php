@@ -130,13 +130,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">🎬 Wibufest</div>
+            <div class="logo"> Wibufest Jogja</div>
             <h2 class="title">Konfirmasi Booking Tiket</h2>
         </div>
 
         <p class="greeting">Halo, <strong>{{ $booking->name }}</strong>! 👋</p>
         
-        <p>Terima kasih telah melakukan booking untuk acara <strong>Wibufest Film Festival</strong>. Berikut adalah detail booking Anda:</p>
+        <p>Terima kasih telah melakukan booking di<strong> Wiftix</strong>. Berikut adalah detail booking Anda:</p>
 
         <div class="info-box">
             <div class="info-row">
@@ -174,11 +174,11 @@
         </div>
 
         <p style="text-align: center; margin: 30px 0;">
-            Sampai jumpa di acara! 🎉
+            Sampai jumpa! 🎉
         </p>
 
         <div class="footer">
-            <p style="margin: 5px 0;"><strong>Wibufest Film Festival</strong></p>
+            <p style="margin: 5px 0;"><strong>Wibufest Jogja Production</strong></p>
             <p style="margin: 5px 0;">Email ini dikirim otomatis, mohon tidak membalas.</p>
             <p style="margin: 5px 0; color: #9ca3af;">© 2025 Wibufest. All rights reserved.</p>
         </div>

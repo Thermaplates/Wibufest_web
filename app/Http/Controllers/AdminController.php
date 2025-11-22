@@ -226,22 +226,19 @@ class AdminController extends Controller
                 return redirect()->route('admin.dashboard')->with('error', 'Email tidak valid: ' . $booking->email);
             }
             
-            // Set timeout untuk email
-            ini_set('max_execution_time', 60);
-            
             // Log sebelum kirim
-            \Log::info('Attempting to send email to: ' . $booking->email);
+            \Log::info('Queueing email to: ' . $booking->email);
             
-            // Kirim email
-            Mail::to($booking->email)->send(new BookingTicketMail($booking));
+            // Queue email untuk dikirim di background (tidak tunggu kirim selesai)
+            Mail::to($booking->email)->queue(new BookingTicketMail($booking));
             
-            \Log::info('Email sent successfully to: ' . $booking->email);
-            return redirect()->route('admin.dashboard')->with('success', 'Email tiket berhasil dikirim ke ' . $booking->email);
+            // Return langsung tanpa tunggu email terkirim
+            return redirect()->route('admin.dashboard')->with('success', 'Email tiket sedang dikirim ke ' . $booking->email . '. Proses di background.');
             
         } catch (\Exception $e) {
-            \Log::error('Send email error: ' . $e->getMessage());
+            \Log::error('Queue email error: ' . $e->getMessage());
             \Log::error('Stack trace: ' . $e->getTraceAsString());
-            return redirect()->route('admin.dashboard')->with('error', 'Gagal mengirim email: ' . $e->getMessage());
+            return redirect()->route('admin.dashboard')->with('error', 'Gagal queue email: ' . $e->getMessage());
         }
     }
 
