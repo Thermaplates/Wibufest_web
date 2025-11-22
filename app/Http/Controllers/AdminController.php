@@ -226,7 +226,8 @@ class AdminController extends Controller
                 return redirect()->route('admin.dashboard')->with('error', 'Email tidak valid: ' . $booking->email);
             }
             
-            // Log sebelum kirim
+            // Log driver & target email
+            \Log::info('Queue driver in use: ' . config('queue.default'));
             \Log::info('Queueing email to database for: ' . $booking->email);
             
             // Queue email ke database (akan diproses oleh queue worker)

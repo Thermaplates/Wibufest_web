@@ -1,1 +1,2 @@
 web: bash start.sh
+worker: php artisan queue:work --sleep=1 --tries=3 --timeout=120
