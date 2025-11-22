@@ -305,21 +305,40 @@ class AdminController extends Controller
     // Hapus film
     public function deleteFilm($id)
     {
-        DB::transaction(function() use ($id) {
-            $film = Film::findOrFail($id);
-            
-            // Hapus poster jika ada
-            if ($film->poster && file_exists(public_path($film->poster))) {
-                unlink(public_path($film->poster));
-            }
-            
-            // Hapus semua tiket terkait
-            Ticket::where('film_id', $id)->delete();
-            
-            // Hapus film
-            $film->delete();
-        });
+        try {
+            DB::transaction(function() use ($id) {
+                $film = Film::findOrFail($id);
+                
+                // Hapus poster jika ada DAN tidak digunakan oleh film lain
+                if ($film->poster && file_exists(public_path($film->poster))) {
+                    // Cek apakah ada film lain yang menggunakan poster yang sama
+                    $otherFilmsWithSamePoster = Film::where('id', '!=', $id)
+                        ->where('poster', $film->poster)
+                        ->exists();
+                    
+                    // Hanya hapus file jika tidak ada film lain yang pakai
+                    if (!$otherFilmsWithSamePoster) {
+                        unlink(public_path($film->poster));
+                    }
+                }
+                
+                // Hapus semua tiket terkait
+                Ticket::where('film_id', $id)->delete();
+                
+                // Hapus film
+                $film->delete();
+                
+                // Reset auto-increment jika tidak ada film lagi
+                $filmCount = Film::count();
+                if ($filmCount === 0) {
+                    DB::statement('ALTER TABLE films AUTO_INCREMENT = 1');
+                }
+            });
 
-        return redirect()->route('admin.films')->with('success','Film berhasil dihapus.');
+            return redirect()->route('admin.films')->with('success', 'Film berhasil dihapus.');
+        } catch (\Exception $e) {
+            \Log::error('Error deleting film: ' . $e->getMessage());
+            return redirect()->route('admin.films')->with('error', 'Gagal menghapus film: ' . $e->getMessage());
+        }
     }
 }
