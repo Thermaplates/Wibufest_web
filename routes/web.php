@@ -22,6 +22,7 @@ Route::prefix('admin')->middleware('admin.password')->group(function () {
     Route::get('/booking/{id}', [AdminController::class, 'showBooking']);
     Route::get('/booking/{id}/payment', [AdminController::class, 'showPayment']);
     Route::post('/booking/{id}/delete', [AdminController::class, 'deleteBooking'])->name('admin.booking.delete');
+    Route::post('/booking/{id}/send-email', [AdminController::class, 'sendTicketEmail'])->name('admin.booking.send-email');
     Route::post('/bookings/clear-all', [AdminController::class, 'clearAllBookings'])->name('admin.bookings.clear');
 
     Route::get('/films', [AdminController::class,'films'])->name('admin.films');

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingTicketMail;
 
 class AdminController extends Controller
 {
@@ -210,6 +212,22 @@ class AdminController extends Controller
             DB::rollBack();
             \Log::error('Delete booking error: ' . $e->getMessage());
             return redirect()->route('admin.dashboard')->with('error','Gagal menghapus booking: ' . $e->getMessage());
+        }
+    }
+
+    // Kirim email tiket ke customer
+    public function sendTicketEmail($id)
+    {
+        try {
+            $booking = Booking::with(['tickets', 'film'])->findOrFail($id);
+            
+            // Kirim email
+            Mail::to($booking->email)->send(new BookingTicketMail($booking));
+            
+            return redirect()->route('admin.dashboard')->with('success', 'Email tiket berhasil dikirim ke ' . $booking->email);
+        } catch (\Exception $e) {
+            \Log::error('Send email error: ' . $e->getMessage());
+            return redirect()->route('admin.dashboard')->with('error', 'Gagal mengirim email: ' . $e->getMessage());
         }
     }
 
