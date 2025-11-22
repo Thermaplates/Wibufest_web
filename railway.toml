@@ -1,3 +1,4 @@
+
 [build]
 builder = "NIXPACKS"
 
@@ -5,3 +6,9 @@ builder = "NIXPACKS"
 startCommand = "bash start.sh"
 healthcheckPath = "/"
 healthcheckTimeout = 100
+
+[services.web]
+start = "bash start.sh"
+
+[services.worker]
+start = "php artisan queue:work"
