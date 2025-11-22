@@ -9,7 +9,7 @@
   // Force dark mode permanently
   document.documentElement.classList.add('dark');
 </script>
-<script src="https://cdn.tailwindcss.com" defer></script>
+<script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config = { darkMode: 'class' }</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -182,7 +182,7 @@ function showBooking(id){
     const wrap = document.getElementById('mimgwrap');
 
     if(d.has_payment){
-      wrap.innerHTML = '<div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700"><img src="/admin/booking/'+id+'/payment" class="w-full h-auto max-h-[60vh] object-contain mx-auto" loading="lazy" /></div>';
+      wrap.innerHTML = '<div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700" style="max-width:100%;"><img src="/admin/booking/'+id+'/payment" class="w-full h-auto max-h-[60vh] object-contain mx-auto" style="max-width:100%; max-height:60vh;" loading="lazy" /></div>';
     } else {
       wrap.innerHTML = '<div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"><svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><p class="text-red-700 dark:text-red-300">Tidak ada bukti pembayaran</p></div>';
     }
