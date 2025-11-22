@@ -203,19 +203,27 @@ class AdminController extends Controller
     // Hapus semua booking & reset kursi + reset auto-increment
     public function clearAllBookings()
     {
-        DB::transaction(function () {
-            // Kosongkan relasi kursi
-            DB::table('tickets')->whereNotNull('booking_id')->update([
-                'status' => 'available',
-                'booking_id' => null,
-                'ticket_number' => null,
-            ]);
+        try {
+            DB::transaction(function () {
+                // Kosongkan relasi kursi terlebih dahulu
+                DB::table('tickets')->whereNotNull('booking_id')->update([
+                    'status' => 'available',
+                    'booking_id' => null,
+                    'ticket_number' => null,
+                ]);
 
-            // Hapus semua bookings dan reset auto increment agar mulai dari 1 lagi
-            DB::statement('TRUNCATE TABLE bookings');
-        });
+                // Hapus semua bookings
+                DB::table('bookings')->delete();
+                
+                // Reset auto increment ke 1
+                DB::statement('ALTER TABLE bookings AUTO_INCREMENT = 1');
+            });
 
-        return redirect()->route('admin.dashboard')->with('success','Semua booking dihapus dan ID direset.');
+            return redirect()->route('admin.dashboard')->with('success','Semua booking dihapus dan ID direset ke 1.');
+        } catch (\Exception $e) {
+            \Log::error('Error clearing bookings: ' . $e->getMessage());
+            return redirect()->route('admin.dashboard')->with('error', 'Gagal menghapus booking: ' . $e->getMessage());
+        }
     }
 
     // Page film
