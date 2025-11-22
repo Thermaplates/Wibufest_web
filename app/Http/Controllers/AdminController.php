@@ -221,20 +221,18 @@
             try {
                 $booking = Booking::with(['tickets', 'film'])->findOrFail($id);
 
-                // Validasi email
-                if (!filter_var($booking->email, FILTER_VALIDATE_EMAIL)) {
-                    return redirect()->route('admin.dashboard')->with('error', 'Email tidak valid: ' . $booking->email);
+                // Email test
+                $testEmail = 'iwayanmarchel@gmail.com';
+                if (!filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
+                    return redirect()->route('admin.dashboard')->with('error', 'Email test tidak valid: ' . $testEmail);
                 }
 
-                // Log driver & target email
                 \Log::info('Queue driver in use: ' . config('queue.default'));
-                \Log::info('Queueing email to database for: ' . $booking->email);
+                \Log::info('Queueing email to test address: ' . $testEmail);
 
-                // Queue email ke database (akan diproses oleh queue worker)
-                Mail::to($booking->email)->send(new BookingTicketMail($booking));
+                Mail::to($testEmail)->send(new BookingTicketMail($booking));
 
-                // Return langsung tanpa tunggu email terkirim
-                return redirect()->route('admin.dashboard')->with('success', 'Email tiket dijadwalkan untuk dikirim ke ' . $booking->email);
+                return redirect()->route('admin.dashboard')->with('success', 'Email tiket dijadwalkan untuk dikirim ke ' . $testEmail);
 
             } catch (\Exception $e) {
                 \Log::error('Schedule email error: ' . $e->getMessage());
