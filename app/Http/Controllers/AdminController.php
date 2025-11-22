@@ -227,18 +227,17 @@ class AdminController extends Controller
             }
             
             // Log sebelum kirim
-            \Log::info('Queueing email to: ' . $booking->email);
+            \Log::info('Queueing email to database for: ' . $booking->email);
             
-            // Queue email untuk dikirim di background (tidak tunggu kirim selesai)
+            // Queue email ke database (akan diproses oleh queue worker)
             Mail::to($booking->email)->queue(new BookingTicketMail($booking));
             
             // Return langsung tanpa tunggu email terkirim
-            return redirect()->route('admin.dashboard')->with('success', 'Email tiket sedang dikirim ke ' . $booking->email . '. Proses di background.');
+            return redirect()->route('admin.dashboard')->with('success', 'Email tiket dijadwalkan untuk dikirim ke ' . $booking->email);
             
         } catch (\Exception $e) {
-            \Log::error('Queue email error: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
-            return redirect()->route('admin.dashboard')->with('error', 'Gagal queue email: ' . $e->getMessage());
+            \Log::error('Schedule email error: ' . $e->getMessage());
+            return redirect()->route('admin.dashboard')->with('error', 'Gagal menjadwalkan email: ' . $e->getMessage());
         }
     }
 
